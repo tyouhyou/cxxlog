@@ -6,9 +6,9 @@ There has two head files to provide the logging functions, clog.h and cxxlog.hpp
 As the file names indicate, clog.h is mainly for using with c or c++ (c++03 and early) project while cxxlog.hpp is expected to be with c++  project. However, you may also use clog.h in your c++11 project. These two utility are not of the same functions.
 
 **********
-##cxxlog.hpp
+## cxxlog.hpp
 
-####_Usage:_
+_***Usage:***_
 
 ```
 D(file_d) << "This is debug message. i=" << i;
@@ -52,9 +52,9 @@ It will omit the locking when creating / openning log file.
 - There have four log levels. However, you cannot control which level's log can be output and which ones should not during compile. If this is what you want, use functions in clog.h.
 
 ******
-##clog.h
+## clog.h
 
-####_Usage:_
+_***Usage:***_
 ```
 LOGD("%s. (i=%d)", "Hello", 2);
 LOGI("%s", "I am information.");
