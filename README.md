@@ -11,18 +11,22 @@ As the file names indicate, clog.h is mainly for using with c or c++ (c++03 and 
 _***Usage:***_
 
 ```
-D(file_d) << "This is debug message. i=" << i;
-I(file_i) << "For your information.";
-W(file_w) << "I warn you.";
-E(file_e) << "Error!!! => " << e;
+D(file) << "This is debug message. i=" << i;
+I(file) << "For your information.";
+W(file) << "I warn you.";
+E(file) << "Error!!! => " << e;
 ```
+(The specified log files may vary, are not necessarily to be the same file.)
+
 The output of logs are as follows:
 
 ```
 [DEBUG][main.cpp][4][main][May  3 2020][09:26:55] - This is debug message. i=2
+[INFO][May  3 2020][09:26:55] - For your information.
+[ERROR][May  3 2020][09:26:55] - I warn you.
 [ERROR][May  3 2020][09:26:55] - An error message goes here.
 ```
-Debug log has file, line, method information while other messages do not have it.
+Debug log has file, line, method information while other logs do not have it.
 Even carriage return is not added at the end of each log, one message take one line exactly, saving us from typing [ << endl ].
 
 If you need outputting message without carriage return added automatically, use V(file) macro. And when carriage return is needed, VL(file) will add it.
