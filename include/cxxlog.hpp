@@ -23,49 +23,36 @@
 #define __FILENAME__ (strrchr("/" __FILE__, '/') + 1)
 
 // output message to file
-#define V(f) *log::Log::get_logger(f)
-#define VL(f) (log::ENDL(f), V(f))
-#define D(f) (log::ENDL(f), V(f) << "[DEBUG][" << __FILENAME__ << "][" << __LINE__ << "][" << __func__ << "][" << __DATE__ << "][" << __TIME__ << "] - ")
-#define I(f) (log::ENDL(f), V(f) << "[INFO ][" << __DATE__ << "][" << __TIME__ << "] - ")
-#define W(f) (log::ENDL(f), V(f) << "[WARN ][" << __DATE__ << "][" << __TIME__ << "] - ")
-#define E(f) (log::ENDL(f), V(f) << "[ERROR][" << __DATE__ << "][" << __TIME__ << "] - ")
+#define V(f) *th_util_log::Log::get_logger(f)
+#define VL(f) (th_util_log::ENDL(f), V(f))
+#define D(f) (th_util_log::ENDL(f), V(f) << "[DEBUG][" << __FILENAME__ << "][" << __LINE__ << "][" << __func__ << "][" << __DATE__ << "][" << __TIME__ << "] - ")
+#define I(f) (th_util_log::ENDL(f), V(f) << "[INFO ][" << __DATE__ << "][" << __TIME__ << "] - ")
+#define W(f) (th_util_log::ENDL(f), V(f) << "[WARN ][" << __DATE__ << "][" << __TIME__ << "] - ")
+#define E(f) (th_util_log::ENDL(f), V(f) << "[ERROR][" << __DATE__ << "][" << __TIME__ << "] - ")
 
 // output message to wcerr
-#if defined(UNICODE) || defined(_UNICODE)
-#define VERB std::wcerr
-#else
 #define VERB std::cerr
-#endif
-#define VERBL (log::ENDL(), std::wcerr)
-#define DEBUGL (log::ENDL(), VERB << "[DEBUG][" << __FILENAME__ << "][" << __LINE__ << "][" << __func__ << "][" << __DATE__ << "][" << __TIME__ << "] - ")
-#define INFOL (log::ENDL(), VERB << "[INFO ][" << __DATE__ << "][" << __TIME__ << "] - ")
-#define WARNL (log::ENDL(), VERB << "[WARN ][" << __DATE__ << "][" << __TIME__ << "] - ")
-#define ERRORL (log::ENDL(), VERB << "[ERROR][" << __DATE__ << "][" << __TIME__ << "] - ")
-
-// TODO: performance-metrics, stopwatch, etc.
+#define VERBL (th_util_log::ENDL(), VERB)
+#define DEBUGL (th_util_log::ENDL(), VERB << "[DEBUG][" << __FILENAME__ << "][" << __LINE__ << "][" << __func__ << "][" << __DATE__ << "][" << __TIME__ << "] - ")
+#define INFOL (th_util_log::ENDL(), VERB << "[INFO ][" << __DATE__ << "][" << __TIME__ << "] - ")
+#define WARNL (th_util_log::ENDL(), VERB << "[WARN ][" << __DATE__ << "][" << __TIME__ << "] - ")
+#define ERRORL (th_util_log::ENDL(), VERB << "[ERROR][" << __DATE__ << "][" << __TIME__ << "] - ")
 
 
 ///// The objects backing the log macros. Do not use them directly /////
 
 #define __LOG_LOCK_GET__
 
-namespace log
+namespace th_util_log
 {
 
 class Log;
-struct KV
-{
-    std::string file;
-    std::shared_ptr<Log> logger;
-};
 class Logendl{};
-
 static constexpr Logendl __lendl__;
-static std::vector<KV> __loggers__;
-
 #ifdef __LOG_LOCK_GET__
 static std::mutex __get_logger_mtx__;
 #endif
+static std::vector<std::pair<std::string, std::shared_ptr<Log>>> __loggers__;
 
 class Log
 {
@@ -77,23 +64,23 @@ public:
         std::lock_guard<std::mutex> lock(__get_logger_mtx__);
 #endif
 
-        KV mkv;
-        if (std::any_of(log::__loggers__.begin(), log::__loggers__.end(), [file_name, &mkv](KV &kv) {
+        std::pair<std::string, std::shared_ptr<Log>> mkv;
+        if (std::any_of(th_util_log::__loggers__.begin(), th_util_log::__loggers__.end(), [file_name, &mkv](std::pair<std::string, std::shared_ptr<Log>> &kv) {
                 mkv = kv;
-                return kv.file.compare(file_name) == 0;
+                return kv.first.compare(file_name) == 0;
             }))
         {
-            return mkv.logger;
+            return mkv.second;
         }
 
         if (create)
         {
             std::shared_ptr<Log> p { new Log(file_name) };
             mkv = {file_name, p};
-            log::__loggers__.push_back(mkv);
+            th_util_log::__loggers__.push_back(mkv);
         }
 
-        return mkv.logger;
+        return mkv.second;
     }
 
 public:
