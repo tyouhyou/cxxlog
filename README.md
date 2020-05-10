@@ -3,7 +3,7 @@
 
 There have two head files to provide the logging functions, clog.h and cxxlog.hpp. 
 
-As the file names indicate, clog.h is mainly for using with c or c++ (c++03 and early) project while cxxlog.hpp is expected to be with c++ (c++11 and later) project. However, you may also use clog.h in your c++11 project. These two utility are not of the same functions.
+As the file names indicate, clog.h is mainly for using with c or c++ (c++03 and early) project while cxxlog.hpp is expected to be with c++ (c++11 and later) project. However, you may also use clog.h in your c++11 project, while cxxlog cannot be compiled with c or c++03 and earlier.
 
 **********
 ## cxxlog.hpp
@@ -24,10 +24,10 @@ The output of logs are as follows:
 [DEBUG][main.cpp][4][main][May  3 2020][09:26:55] - This is debug message. i=2
 [INFO][May  3 2020][09:26:55] - For your information.
 [ERROR][May  3 2020][09:26:55] - I warn you.
-[ERROR][May  3 2020][09:26:55] - An error message goes here.
+[ERROR][May  3 2020][09:26:55] - Error!!! => exception message.
 ```
 Debug log has file name, line number, method name etc. information while other logs not.
-Carriage return is added automatically at the end of each log message. One message take one line exactly, saving us from typing [ << endl ].
+Carriage return is added automatically at the end of each log message. One message take one line exactly.
 
 If outputting message without carriage return is desired, use V(file) macro, which outputting message as it is, without any extra info or formatting. And use VL(file) to add the carriage return. (endl cannot be added directly to the log stream.)
 
@@ -48,10 +48,10 @@ ERRORL << "Error!!! => " << e;
 ```
 
 **NOTE:** 
-- While creating / openning log file is thread safe, outputting message is NOT thread safe. If performance does matter, comment out the following line in the hpp file.
+- While creating / openning log file is thread safe, outputting message is NOT thread safe. 
+If performance does matter, and even lock on file creating / openning is not desired, comment out the following line in the hpp file.
 `#define __LOG_LOCK_GET__`
-It will also omit locking when create / open log file.
-- There have four log levels (debug, info, warn, error). However, you cannot control which level(s) can be output and which ones should not during compile. Anyway, you may use clog.h to control which level can be output, or just define other macros to mask the exist ones. 
+- There have four log levels (debug, info, warn, error). However, you cannot control which level(s) can be output and which ones should not during compile. Anyway, you may use clog.h to achieve it, or just define other macros to mask the exist ones. 
 
 ******
 ## clog.h
