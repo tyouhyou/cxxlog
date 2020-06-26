@@ -33,8 +33,12 @@ clean:
 	-$(RM) $(BIN)/$(EXECUTABLE)
 	-$(RM) $(OBJECTS)
 
-run: all
+.PHONY: clear
+clear:
+	-$(RM) $(OBJECTS)
+
+run:
 	./$(BIN)/$(EXECUTABLE)
 
 $(BIN)/$(EXECUTABLE): $(OBJECTS)
-	$(CC) $(CFLAGS) $(CINCLUDES) $(CLIBS) $^ -o $@ $(LIBRARIES)
+	$(CC) $(CFLAGS) $(DEBUG) $(CINCLUDES) $(CLIBS) $^ -o $@ $(LIBRARIES)

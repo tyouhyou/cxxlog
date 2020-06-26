@@ -1,57 +1,79 @@
 # cxxlog
 *C/C++ log utility.*
 
-There have two head files to provide the logging functions, clog.h and cxxlog.hpp. 
+With this logging util you can output messages to std::err or any specified log file by including header file cxxlog.hpp in your project. It's very easy to use and you can control which level's log can be output or not during compilation.
 
-As the file names indicate, clog.h is mainly for using with c or c++ (c++03 and early) project while cxxlog.hpp is expected to be with c++ (c++11 and later) project. However, you may also use clog.h in your c++11 project, while cxxlog cannot be compiled with c or c++03 and earlier.
+Also, we provide clog.h for dealing with projects before c++11, you may have a look into the file for detailed information.
 
 **********
 ## cxxlog.hpp
 
-_***Usage:***_
+This utility is used with c++11 or above.
+
+### Usage:
+
+We can deal with outputting as follows
+- All logs go to std::err
+- All logs go to one file
+- More than one log files for outputting.
+
+There are 4 log levels, debug, info, warn, error. Use Macros
+- D to output debug level log
+- I for information log
+- W for warning log
+- and E for error log
+
+```#include cxxlog.cpp```
+```
+D << "This is debug message. i=" << i;
+I << "For your information.";
+W << "I warn you.";
+E << "Error!!! => " << e;
+```
+
+Each log take one line. The carriage return will be added automatically.
+The outputting are as follows:
 
 ```
-D(file) << "This is debug message. i=" << i;
-I(file) << "For your information.";
-W(file) << "I warn you.";
-E(file) << "Error!!! => " << e;
-```
-(The specified log files may vary, are not necessarily to be same.)
-
-The output of logs are as follows:
-
-```
-[DEBUG][main.cpp][4][main][May  3 2020][09:26:55] - This is debug message. i=2
+[DEBUG][May  3 2020][09:26:55][main.cpp][4][main] - This is debug message. i=2
 [INFO][May  3 2020][09:26:55] - For your information.
 [ERROR][May  3 2020][09:26:55] - I warn you.
 [ERROR][May  3 2020][09:26:55] - Error!!! => exception message.
 ```
-Debug log has file name, line number, method name etc. information while other logs not.
-Carriage return is added automatically at the end of each log message. One message take one line exactly.
 
-If outputting message without carriage return is desired, use V(file) macro, which outputting message as it is, without any extra info or formatting. And use VL(file) to add the carriage return. (endl cannot be added directly to the log stream.)
+As you may notice, the debug log has code information --> code file, line, and method name. While other logs do not have such information.
 
-__*In Regard to the log file(s)*__
+So, where does the logs go?
 
-The above functions will output message to the file(s) in brackets. To make things simplier, you may define some new macros to omit the typing of file path. For example:
+If _LOG_FILE macro is defined, the logs will be output to the file defined by this macro.
+```#define _LOG_FILE "mylog.txt"```
+(or uncomment the line of _LOG_FILE in cxxlog.hpp)
 
-`#define DF D("path/to/mylog.log")`
+By defining _LOG_FILE, all the logs will be output to that file. if no _LOG_FILE macro defined, the outputting will go to std::err.
 
-The specified log files will be opened through the app life span. And be closed when the app goes end.
+Macros
+- DE
+- IE
+- WE
+- EE
+will alway output logs to std::err, in spite of _LOG_FILE definition.
 
-Also messages can be output to stderr instead of file(s). Use the following macros.
-```
-DEBUGL << "This is debug message. i=" << i;
-INFOL << "For your information.";
-WARNL << "I warn you.";
-ERRORL << "Error!!! => " << e;
-```
+Then, how to output logs to specified file(s)? It can be accomplished by using macros
+- DF(file)
+- IF(file)
+- WF(file)
+- EE(file)
+
+File names passed to these macros, are not necessarily to be same. Any valid file can be used. Logs will be deliverred to the specified file(s). 
+
+In regard to contorl which level log should be output, define or modify the LOG_LEVEL micro. When LOG_LEVEL is greater the log macro level, the macro will not output any log.
+
+Say, if LOG_LEVEL is set to _LOG_INFO, the D / DE / DF macros will be quiet. and if level is set to _LOG_WARN, Debug and Info level macros shut up.
+
 
 **NOTE:** 
-- While creating / openning log file is thread safe, outputting message is NOT thread safe. 
-If performance does matter, and even lock on file creating / openning is not desired, comment out the following line in the hpp file.
-`#define __LOG_LOCK_GET__`
-- There have four log levels (debug, info, warn, error). However, you cannot control which level(s) can be output and which ones should not during compile. Anyway, you may use clog.h to achieve it, or just define other macros to mask the exist ones. 
+- The specified log files will be opened all through the app life span, and be closed when the app goes end.
+- If thread safe is desired, define _LOG_LOCK (or uncomment the line in cxxlog.hpp). 
 
 ******
 ## clog.h
@@ -66,6 +88,6 @@ LOGE("%s", "I am error.");
 They somehow look like fprintf. The pros over fprintf are:
 - Carriage return will be added automatically.
 - Print formatted information before your message.
-- Log level contorl. You can determine which level's log could be output by define LOG_LEVEL. Say `#define LOG_LEVEL _LOG_WARN` makes LOGD and LOGI not work, while LOGW and LOGE can output their logs.
+- Log level contorl. 
 
-All the log messages will be output to stderr. If outputting to file is desired, use redirect can send all logs to the re-directed file.
+And all the messages will be output to std::err. If outputting to file is desired, use redirect can send all logs to the re-directed file.

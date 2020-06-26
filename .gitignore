@@ -1,7 +1,9 @@
 # The build environment
 bin/
 lib/
+test/
 .vscode/
+.replit
 
 # Prerequisites
 *.d

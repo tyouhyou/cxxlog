@@ -6,23 +6,25 @@ int main(int argc, char *argv[])
     th_util::StopWatch sw;
     sw.start();
 
-    D("bin/debug.log") << "This is debug message.";
-    I("bin/info.log") << "Information for you.";
-    W("warn.log") << "I warn you.";
-    E("error.log") << "An error message goes here.";
+    DF("test/debug.log") << "This is debug message.";
+    IF("test/info.log") << "Information for you.";
+    WF("test/warn.log") << "I warn you.";
+    EF("test/error.log") << "An error message goes here.";
 
-    INFOL << "first 4 logs elasped: " << sw.perf() << " microseconds";
+    IE << "first 4 logs elasped: " << sw.perf() << " microseconds";
 
-    D("bin/debug.log") << "This is debug message again.";
-    I("bin/info.log") << "Information for you again.";
-    W("bin/warn.log") << "I warn you again.";
-    E("bin/error.log") << "An error message goes here again.";
+    DF("test/debug2.log") << "This is debug message again.";
+    IF("test/info2.log") << "Information for you again.";
+    WF("test/warn2.log") << "I warn you again.";
+    EF("test/error2.log") << "An error message goes here again.";
 
-    INFOL << "second 4 logs elasped: " << sw.perf() << " microseconds";
+    IE << "second 4 logs elasped: " << sw.perf() << " microseconds";
 
-    DEBUGL << "bug to cerr";
-    INFOL << "info to cerr";
+    D << "debug to cerr";
+    I << "info to cerr";
+    W << "warn to cerr";
+    E << "error to cerr";
 
-    INFOL << "last 2 logs elasped: " << sw.perf() << " microseconds";
-    INFOL << "lap: " << sw.lap() << " microseconds.";
+    IE << "last 4 logs (to std::cerr) elasped: " << sw.perf() << " microseconds";
+    IE << "lap: " << sw.lap() << " microseconds.";
 }
