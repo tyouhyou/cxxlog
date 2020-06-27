@@ -38,20 +38,20 @@ The outputting are as follows:
 [DEBUG][May  3 2020][09:26:55][main.cpp][4][main] - This is debug message. i=2
 [INFO][May  3 2020][09:26:55] - For your information.
 [ERROR][May  3 2020][09:26:55] - I warn you.
-[ERROR][May  3 2020][09:26:55] - Error!!! => exception message.
+[ERROR][May  3 2020][09:26:55][main.cpp][7][main] - Error!!! => exception message.
 ```
 
-As you may notice, the debug log has code information --> code file, line, and method name. While other logs do not have such information.
+As you may notice, the debug and error logs have [code information] --> code file, line, and method name. While other logs do not have such information.
 
-So, where does the logs go?
+So, where do the logs go?
 
-If _LOG_FILE macro is defined, the logs will be output to the file defined by this macro.
-```#define _LOG_FILE "mylog.txt"```
-(or uncomment the line of _LOG_FILE in cxxlog.hpp)
+If _LOG_FILE macro is defined, the logs will be output to that file.
+```#define _LOG_FILE "path/to/mylog.txt"```
+(or un-comment the line of _LOG_FILE in cxxlog.hpp)
 
 By defining _LOG_FILE, all the logs will be output to that file. if no _LOG_FILE macro defined, the outputting will go to std::err.
 
-Macros
+Macros,
 - DE
 - IE
 - WE
@@ -68,7 +68,7 @@ File names passed to these macros, are not necessarily to be same. Any valid fil
 
 In regard to contorl which level log should be output, define or modify the LOG_LEVEL micro. When LOG_LEVEL is greater the log macro level, the macro will not output any log.
 
-Say, if LOG_LEVEL is set to _LOG_INFO, the D / DE / DF macros will be quiet. and if level is set to _LOG_WARN, Debug and Info level macros shut up.
+Say, if LOG_LEVEL is set to _LOG_INFO, then D / DE / DF macros will be quiet. and if level is set to _LOG_WARN, Debug and Info level macros shut up.
 
 
 **NOTE:** 

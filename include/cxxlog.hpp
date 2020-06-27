@@ -53,7 +53,7 @@
 #define DF(f) if(LOG_LEVEL > _LOG_DEBUG) {} else __LOGF_W_CODEINFO__(f, VF(f), "[DEBUG]")
 #define IF(f) if(LOG_LEVEL > _LOG_INFO) {} else __LOGF_WO_CODEINFO__(f, VF(f), "[INFO ]")
 #define WF(f) if(LOG_LEVEL > _LOG_WARN) {} else __LOGF_WO_CODEINFO__(f, VF(f), "[WARN ]")
-#define EF(f) if(LOG_LEVEL > _LOG_ERROR) {} else __LOGF_WO_CODEINFO__(f, VF(f), "[ERROR]")
+#define EF(f) if(LOG_LEVEL > _LOG_ERROR) {} else __LOGF_W_CODEINFO__(f, VF(f), "[ERROR]")
 
 // output message to cerr
 #define VE std::cerr
@@ -62,7 +62,7 @@
 #define DE if(LOG_LEVEL > _LOG_DEBUG) {} else __LOG_W_CODEINFO__(VE, "[DEBUG]")
 #define IE if(LOG_LEVEL > _LOG_INFO) {} else __LOG_WO_CODEINFO__(VE, "[INFO ]")
 #define WE if(LOG_LEVEL > _LOG_WARN) {} else __LOG_WO_CODEINFO__(VE, "[WARN ]")
-#define EE if(LOG_LEVEL > _LOG_ERROR) {} else __LOG_WO_CODEINFO__(VE, "[ERROR]")
+#define EE if(LOG_LEVEL > _LOG_ERROR) {} else __LOG_W_CODEINFO__(VE, "[ERROR]")
 
 // output to _LOG_FILE
 #ifdef _LOG_FILE
