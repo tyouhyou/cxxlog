@@ -1,74 +1,82 @@
 # cxxlog
-*C/C++ log utility.*
 
-With this logging util you can output messages to std::err or any specified log file by including header file cxxlog.hpp in your project. It's very easy to use and you can control which level's log can be output or not during compilation.
+*TL;NR*
 
-Also, we provide clog.h for dealing with projects before c++11, you may have a look into the file for detailed information.
-
-**********
-## cxxlog.hpp
-
-This utility is used with c++11 or above.
-
-### Usage:
-
-We can deal with outputting as follows
-- All logs go to std::err
-- All logs go to one file
-- More than one log files for outputting.
-
-There are 4 log levels, debug, info, warn, error. Use Macros
-- D to output debug level log
-- I for information log
-- W for warning log
-- and E for error log
+This is a C++ logging utility. It is very easy to output logs to std::cerr or any specified log file(s). 
 
 ```#include cxxlog.cpp```
+
 ```
 D << "This is debug message. i=" << i;
 I << "For your information.";
-W << "I warn you.";
+W << "Caution!";
 E << "Error!!! => " << e;
 ```
 
-Each log take one line. The carriage return will be added automatically.
-The outputting are as follows:
+Output will be:
 
 ```
 [DEBUG][May  3 2020][09:26:55][main.cpp][4][main] - This is debug message. i=2
 [INFO][May  3 2020][09:26:55] - For your information.
-[ERROR][May  3 2020][09:26:55] - I warn you.
+[ERROR][May  3 2020][09:26:55] - Caution!
 [ERROR][May  3 2020][09:26:55][main.cpp][7][main] - Error!!! => exception message.
 ```
 
-As you may notice, the debug and error logs have [code information] --> code file, line, and method name. While other logs do not have such information.
+*Support*
 
-So, where do the logs go?
+c++11 and above.
 
-If _LOG_FILE macro is defined, the logs will be output to that file.
+## Introduction
+
+As you might notice, the debug and error logs have [code information], that includes "code file name", "code line", and "method name". While other logs do not have such information.
+
+## Specify log file(s)
+
+### _LOG_FILE macro
+
+If ```_LOG_FILE``` macro is defined, logs will be written to that file.
+
+e.g.
+
 ```#define _LOG_FILE "path/to/mylog.txt"```
+
 (or un-comment the line of _LOG_FILE in cxxlog.hpp)
 
-By defining _LOG_FILE, all the logs will be output to that file. if no _LOG_FILE macro defined, the outputting will go to std::err.
+If no _LOG_FILE macro defined, the outputting will go to std::cerr.
 
-Macros,
+On the contrary, the following macros will alway output logs to std::cerr, in spite of _LOG_FILE definition.
 - DE
 - IE
 - WE
 - EE
-will alway output logs to std::err, in spite of _LOG_FILE definition.
 
-Then, how to output logs to specified file(s)? It can be accomplished by using macros
+### Log files other than _LOG_FILE
+
+In case there have log files other than ```_LOG_FILE``` for outputting, it can be accomplished by using following macros:
 - DF(file)
 - IF(file)
 - WF(file)
 - EE(file)
 
-File names passed to these macros, are not necessarily to be same. Any valid file can be used. Logs will be deliverred to the specified file(s). 
+The usage and output formatting is same as E/I/W/E macros, but an argument of file added. The outputting of message will not go to ```_LOG_FILE```, but to the specified one.
 
-In regard to contorl which level log should be output, define or modify the LOG_LEVEL micro. When LOG_LEVEL is greater the log macro level, the macro will not output any log.
+File names passed to these macros, are not necessarily to be the same. Any valid file can be used. Logs will be deliverred to the specified file(s). 
 
-Say, if LOG_LEVEL is set to _LOG_INFO, then D / DE / DF macros will be quiet. and if level is set to _LOG_WARN, Debug and Info level macros shut up.
+## Log levels
+
+There have 4 log levels defined: 
+```
+#define _LOG_DEBUG 1
+#define _LOG_INFO 2
+#define _LOG_WARN 3
+#define _LOG_ERROR 4
+```
+
+To contorl which (and above) level log could be output, define or modify the ```LOG_LEVEL``` micro. Only those logs whose level is equal to or greater than ```LOG_LEVEL```, will be written to file. The lower level logs are suppressed.
+
+For instance, if ```LOG_LEVEL``` is set to _LOG_INFO, then DEBUG level(D / DE / DF) macros will be quiet. And if ```LOG_LEVEL``` is set to _LOG_WARN, DEBUG and INFO level macros shut up.
+
+If "DEBUG" or "_DEBUG" macro is defined, the default log level is _LOG_DEBUG, otherwise, it's _LOG_INFO.
 
 
 **NOTE:** 
@@ -90,4 +98,8 @@ They somehow look like fprintf. The pros over fprintf are:
 - Print formatted information before your message.
 - Log level contorl. 
 
-And all the messages will be output to std::err. If outputting to file is desired, use redirect can send all logs to the re-directed file.
+And all the messages will be output to std::cerr. If outputting to file is desired, use redirect can send all logs to the re-directed file.
+
+*******
+
+Any bug reporting and suggestion is welcome. Thanks in advance.

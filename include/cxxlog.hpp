@@ -1,11 +1,6 @@
 /* *
  * A simple log utility for c++ projects (c++11 or later).
  * 
- * Note: 
- *  1. The caller take the responsibility to check if the path of the log file is valid.
- *  2. The log file will be opened all along the process life.
- *  3. Although the outputting to log is NOT thread safe, creating/getting log stream is thread safe.
- *
  * @author  tyouhyou    github.com/tyouhyou
  * */
 
@@ -20,8 +15,6 @@
 #include <algorithm>
 #include <mutex>
 
-// define via compile flag or uncomment the following lines
-
 // #define _LOG_LOCK
 // #define _LOG_FILE "test/log.txt"
 
@@ -33,7 +26,11 @@
 #define _LOG_NONE 9
 
 #ifndef LOG_LEVEL
+#if defined(DEBUG) || defined(_DEBUG)
 #define LOG_LEVEL _LOG_ALL
+#else
+#define LOG_LEVEL _LOG_INFO
+#endif
 #endif
 
 #define __CODE_INFO "[" << __FILENAME__ << "][" << __LINE__ << "][" << __func__ << "]"
@@ -135,6 +132,7 @@ public:
     Log &operator<<(const T &s)
     {
         ofs << s;
+        ofs.flush();
         return *this;
     }
 
