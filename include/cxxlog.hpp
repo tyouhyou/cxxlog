@@ -33,9 +33,9 @@
 #endif
 #endif
 
+#define __FILENAME__ (strrchr("/" __FILE__, '/') + 1)
 #define __CODE_INFO "[" << __FILENAME__ << "][" << __LINE__ << "][" << __func__ << "]"
 #define __TIME_INFO "[" << __DATE__ << "][" << __TIME__ << "]"
-#define __FILENAME__ (strrchr("/" __FILE__, '/') + 1)
 
 #define __LOG_W_CODEINFO__(s, lv) (th_util_log::ENDL(), s << lv << __TIME_INFO << __CODE_INFO << " - ")
 #define __LOG_WO_CODEINFO__(s, lv) (th_util_log::ENDL(), s << lv << __TIME_INFO << " - ")
