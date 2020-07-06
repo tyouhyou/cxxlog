@@ -18,7 +18,7 @@ Output will be:
 ```
 [DEBUG][May  3 2020][09:26:55][main.cpp][4][main] - This is debug message. i=2
 [INFO][May  3 2020][09:26:55] - For your information.
-[ERROR][May  3 2020][09:26:55] - Caution!
+[WARN][May  3 2020][09:26:55] - Caution!
 [ERROR][May  3 2020][09:26:55][main.cpp][7][main] - Error!!! => exception message.
 ```
 
