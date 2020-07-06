@@ -4,7 +4,7 @@
 
 This is a C++ logging utility. It is very easy to output logs to std::cerr or any specified log file(s). 
 
-```#include cxxlog.cpp```
+```#include cxxlog.hpp```
 
 ```
 D << "This is debug message. i=" << i;
