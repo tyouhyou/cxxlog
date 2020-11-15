@@ -16,7 +16,16 @@
 #include <mutex>
 
 // #define _LOG_LOCK
-// #define _LOG_FILE "test/log.txt"
+
+#if defined(UNICODE) || defined(_UNICODE)
+typedef std::wstring tstring;
+#define rchr wcsrchr
+#define c_size 2
+#else
+typedef std::string tstring;
+#define rchr strrchr
+#define c_size 1
+#endif
 
 #define _LOG_ALL 0
 #define _LOG_DEBUG 1
@@ -33,160 +42,121 @@
 #endif
 #endif
 
-#define __FILENAME__ (strrchr("/" __FILE__, '/') + 1)
-#define __CODE_INFO "[" << __FILENAME__ << "][" << __LINE__ << "][" << __func__ << "]"
+#define __FILENAME__ (rchr("/" __FILE__, '/') + c_size)
+#define __CODE_INFO "[" << __FILENAME__ << "(" << __func__ << ")(" << __LINE__ << ")]"
 #define __TIME_INFO "[" << __DATE__ << "][" << __TIME__ << "]"
 
-#define __LOG_W_CODEINFO__(s, lv) (th_util_log::ENDL(), s << lv << __TIME_INFO << __CODE_INFO << " - ")
-#define __LOG_WO_CODEINFO__(s, lv) (th_util_log::ENDL(), s << lv << __TIME_INFO << " - ")
+#define __LOG_W_CODEINFO__(s, lv) (th_util::ENDL(&s), s << lv << __TIME_INFO << __CODE_INFO << " - ")
+#define __LOG_WO_CODEINFO__(s, lv) (th_util::ENDL(&s), s << lv << __TIME_INFO << " - ")
 
-#define __LOGF_W_CODEINFO__(f, s, lv) (th_util_log::ENDL(f), s << lv << __TIME_INFO << __CODE_INFO << " - ")
-#define __LOGF_WO_CODEINFO__(f, s, lv) (th_util_log::ENDL(f), s << lv << __TIME_INFO << " - ")
+#define _D(_V)                  \
+    if (LOG_LEVEL > _LOG_DEBUG) \
+    {                           \
+    }                           \
+    else                        \
+        __LOG_W_CODEINFO__(_V, "[DEBUG]")
+#define _I(_V)                 \
+    if (LOG_LEVEL > _LOG_INFO) \
+    {                          \
+    }                          \
+    else                       \
+        __LOG_WO_CODEINFO__(_V, "[INFO ]")
+#define _W(_V)                 \
+    if (LOG_LEVEL > _LOG_WARN) \
+    {                          \
+    }                          \
+    else                       \
+        __LOG_WO_CODEINFO__(_V, "[WARN ]")
+#define _E(_V)                  \
+    if (LOG_LEVEL > _LOG_ERROR) \
+    {                           \
+    }                           \
+    else                        \
+        __LOG_W_CODEINFO__(_V, "[ERROR]")
 
-// output message to file specified via argument
-#define VF(f) *th_util_log::Log::get_logger(f)
-#define VFL(f) (th_util_log::ENDL(f), VF(f))
+//// USE THE FOLLOWING MACROS ONLY ////
 
-#define DF(f) if(LOG_LEVEL > _LOG_DEBUG) {} else __LOGF_W_CODEINFO__(f, VF(f), "[DEBUG]")
-#define IF(f) if(LOG_LEVEL > _LOG_INFO) {} else __LOGF_WO_CODEINFO__(f, VF(f), "[INFO ]")
-#define WF(f) if(LOG_LEVEL > _LOG_WARN) {} else __LOGF_WO_CODEINFO__(f, VF(f), "[WARN ]")
-#define EF(f) if(LOG_LEVEL > _LOG_ERROR) {} else __LOGF_W_CODEINFO__(f, VF(f), "[ERROR]")
+#define SET_LOGGER(f) th_util::Log::set_log_file(f)
 
-// output message to cerr
-#define VE std::cerr
-#define VEL (th_util_log::ENDL(), VE)
+#define V *th_util::Log::get_logger()
+#define D _D(V)
+#define I _I(V)
+#define W _W(V)
+#define E _E(V)
 
-#define DE if(LOG_LEVEL > _LOG_DEBUG) {} else __LOG_W_CODEINFO__(VE, "[DEBUG]")
-#define IE if(LOG_LEVEL > _LOG_INFO) {} else __LOG_WO_CODEINFO__(VE, "[INFO ]")
-#define WE if(LOG_LEVEL > _LOG_WARN) {} else __LOG_WO_CODEINFO__(VE, "[WARN ]")
-#define EE if(LOG_LEVEL > _LOG_ERROR) {} else __LOG_W_CODEINFO__(VE, "[ERROR]")
+#define VE *th_util::Log::get(std::cerr)
+#define DE _D(VE)
+#define IE _I(VE)
+#define WE _W(VE)
+#define EE _E(VE)
 
-// output to _LOG_FILE
-#ifdef _LOG_FILE
-#define V VF(_LOG_FILE)
-#define VL VFL(_LOG_FILE)
-#define D DF(_LOG_FILE)
-#define I IF(_LOG_FILE)
-#define W WF(_LOG_FILE)
-#define E EF(_LOG_FILE)
-#else
-#define V VE
-#define VL VEL
-#define D DE
-#define I IE
-#define W WE
-#define E EE
-#endif
+#define VF(f) *th_util::Log::get(f)
+#define DF(f) _D(VF(f))
+#define IF(f) _I(VF(f))
+#define WF(f) _W(VF(f))
+#define EF(f) _E(VF(f))
 
-///// The objects backing the above log macros. Do not use them directly /////
+///// The classes below are of backing the above log macros. Do not use them directly /////
 
-namespace th_util_log
+namespace th_util
 {
-
-#ifdef _LOG_LOCK
-static std::mutex __get_logger_mtx__;
-#endif
-
-class Log;
-class Logendl{};
-
-static constexpr Logendl __lendl__;
-static std::vector<std::pair<std::string, std::shared_ptr<Log>>> __loggers__;
-
-class Log
-{
-
-public:
-    static std::shared_ptr<Log> get_logger(const std::string &file_name)
+    class Log
     {
-#ifdef _LOG_LOCK
-        std::lock_guard<std::mutex> lock(__get_logger_mtx__);
-#endif
 
-        std::pair<std::string, std::shared_ptr<Log>> mkv;
-        if (std::any_of(th_util_log::__loggers__.begin(), 
-						th_util_log::__loggers__.end(), 
-						[file_name, &mkv](std::pair<std::string, std::shared_ptr<Log>> &kv) {
-							mkv = kv;
-							return kv.first.compare(file_name) == 0;
-						}))
+    public:
+        static void set_log_file(const tstring &);
+        static std::shared_ptr<Log> get_logger();
+        static std::shared_ptr<Log> get(const tstring &);
+        static std::shared_ptr<Log> get(const std::ostream &);
+
+    public:
+        ~Log();
+
+        template <class T>
+        Log &operator<<(const T &s)
         {
-            return mkv.second;
+            *os << s;
+            return *this;
         }
 
-		std::shared_ptr<Log> p { new Log(file_name) };
-		mkv = {file_name, p};
-		th_util_log::__loggers__.push_back(mkv);
+        Log &operator<<(std::ostream &(*endl)(std::ostream &));
 
-        return mkv.second;
-    }
+        Log(Log &&) = default;
 
-public:
-    ~Log()
-    {
-        ofs.flush();
-        ofs.close();
-    }
+    private:
+        Log() = delete;
+        Log(const Log &) = delete;
+        Log &operator=(const Log &) = delete;
+        Log &operator=(Log &&) = delete;
 
-    template <class T>
-    Log &operator<<(const T &s)
-    {
-        ofs << s;
-        ofs.flush();
-        return *this;
-    }
+        explicit Log(const tstring &file_name);
+        explicit Log(const std::ostream &os);
 
-    Log &operator<<(const Logendl &e)
-    {
-        ofs << std::endl;
-        return *this;
-    }
+        std::shared_ptr<std::ostream> os;
 
-private:
-    Log() = delete;
-    Log(const Log&) = delete;
-    Log(Log&&) = delete;
-    Log &operator=(const Log&) = delete;
-    Log &operator=(const Log&&) = delete;
-    
-    explicit Log(const std::string &file_name)
-    {
 #ifdef _LOG_LOCK
-        std::lock_guard<std::mutex> lock(mtx);
+        std::mutex mtx;
+        static std::mutex __get_logger_mtx__;
 #endif
-        ofs.open(file_name, std::ofstream::out | std::ofstream::app);
-        ofs.setf(std::ios_base::boolalpha);
-    }
+    };
 
-    std::ofstream ofs;
-#ifdef _LOG_LOCK
-    std::mutex mtx;
-#endif
-};
-
-class ENDL
-{
-public:
-    ENDL() = default;
-
-    explicit ENDL(const std::string &file_name)
+    class ENDL
     {
-        this->file_name = file_name;
-    }
 
-    ~ENDL()
-    {
-        if (file_name.empty() && typeid(VE) != typeid(Log))
+    public:
+        explicit ENDL(Log *log)
         {
-            VE << std::endl;
-            return;
+            this->log = log;
         }
-        VF(file_name) << __lendl__;
-    }
 
-private:
-    std::string file_name;
-    
-};
+        ~ENDL()
+        {
+            *(this->log) << std::endl;
+        }
 
-} // namespace log
+    private:
+        ENDL() = delete;
+        Log *log;
+    };
+
+} // namespace th_util
