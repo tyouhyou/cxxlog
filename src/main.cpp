@@ -1,7 +1,7 @@
 #include "cxxlog.hpp"
 #include "stopwatch.hpp"
 
-int main(int argc, char *argv[])
+int main()
 {
     th_util::StopWatch sw;
     sw.start();

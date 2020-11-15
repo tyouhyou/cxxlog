@@ -27,9 +27,11 @@ CLIBS		:= $(patsubst %,-L%, $(LIBDIRS:%/=%))
 DEBUG		:= -g -D_DEBUG
 SOURCES		:= $(wildcard $(SOURCEDIRS)/*.cpp)
 OBJECTS		:= $(SOURCES:.cpp=.o )
+EXFLAGS		:= -D_NOT_CLOSE_LOG
+#EXFLAGS		:= -D_NOT_CLOSE_LOG -D_LOG_LOCK -D_UNICODE
 
 %.o: %.cpp
-	$(CC) $(CFLAGS) $(DEBUG) $(CINCLUDES) -c $< -o $@
+	$(CC) $(CFLAGS) $(EXFLAGS) $(DEBUG) $(CINCLUDES) -c $< -o $@
 
 all: $(BIN)/$(EXECUTABLE)
 	-$(RM) $(OBJECTS)
@@ -47,4 +49,4 @@ run:
 	./$(BIN)/$(EXECUTABLE)
 
 $(BIN)/$(EXECUTABLE): $(OBJECTS)
-	$(CC) $(CFLAGS) $(DEBUG) $(CINCLUDES) $(CLIBS) $^ -o $@ $(LIBRARIES)
+	$(CC) $(CFLAGS) $(EXFLAGS) $(DEBUG) $(CINCLUDES) $(CLIBS) $^ -o $@ $(LIBRARIES)

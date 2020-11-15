@@ -5,6 +5,9 @@ using namespace th_util;
 
 static std::vector<std::pair<tstring, std::shared_ptr<Log>>> __loggers__;
 static std::shared_ptr<Log> __logger__;
+#ifdef _LOG_LOCK
+static std::mutex __get_logger_mtx__;
+#endif
 
 void Log::set_log_file(const tstring &file_name)
 {
@@ -20,7 +23,7 @@ std::shared_ptr<Log> Log::get_logger()
 std::shared_ptr<Log> Log::get(const tstring &file_name)
 {
 #ifdef _LOG_LOCK
-    lock_guard<std::mutex> lock(__get_logger_mtx__);
+    std::lock_guard<std::mutex> lock(__get_logger_mtx__);
 #endif
 
     std::pair<tstring, std::shared_ptr<Log>> mkv;
@@ -51,10 +54,12 @@ std::shared_ptr<Log> Log::get(const std::ostream &os)
 
 Log::Log(const tstring &file_name)
 {
-#ifdef _LOG_LOCK
-    std::lock_guard<std::mutex> lock(mtx);
-#endif
+#ifdef _NOT_CLOSE_LOG
     os = std::make_shared<std::ofstream>(file_name, std::ofstream::out | std::ofstream::app);
+#else
+    _file = file_name;
+    os = std::make_shared<std::ofstream>();
+#endif
     os->setf(std::ios_base::boolalpha);
 }
 
@@ -65,7 +70,6 @@ Log::Log(const std::ostream &o)
 
 Log::~Log()
 {
-    os->flush();
     auto ofs = dynamic_cast<std::ofstream *>(os.get());
     if (ofs)
     {
@@ -73,11 +77,24 @@ Log::~Log()
     }
     os = nullptr;
 
-    // TODO: remove it from __loggers__, remove __logger__, via event.
+    // TODO: remove log reference from __loggers__, remove __logger__, via event.
 }
 
 Log &Log::operator<<(std::ostream &(*endl)(std::ostream &))
 {
+#ifdef _LOG_LOCK
+    std::lock_guard<std::mutex> lock(_mtx);
+#endif
+
     *os << endl;
+
+#ifndef _NOT_CLOSE_LOG
+    auto ofs = dynamic_cast<std::ofstream *>(os.get());
+    if (ofs && ofs->is_open())
+    {
+        ofs->close();
+    }
+#endif
+
     return *this;
 }

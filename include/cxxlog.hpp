@@ -15,8 +15,6 @@
 #include <algorithm>
 #include <mutex>
 
-// #define _LOG_LOCK
-
 #if defined(UNICODE) || defined(_UNICODE)
 typedef std::wstring tstring;
 #define rchr wcsrchr
@@ -115,7 +113,19 @@ namespace th_util
         template <class T>
         Log &operator<<(const T &s)
         {
+#ifdef _LOG_LOCK
+            std::lock_guard<std::mutex> lock(_mtx);
+#endif
+#ifndef _NOT_CLOSE_LOG
+            auto ofs = dynamic_cast<std::ofstream *>(os.get());
+            if (ofs && !ofs->is_open() && !_file.empty())
+            {
+                ofs->open(_file, std::ofstream::out | std::ofstream::app);
+            }
+#endif
             *os << s;
+            os->flush();
+
             return *this;
         }
 
@@ -132,11 +142,11 @@ namespace th_util
         explicit Log(const tstring &file_name);
         explicit Log(const std::ostream &os);
 
+        tstring _file;
         std::shared_ptr<std::ostream> os;
 
 #ifdef _LOG_LOCK
-        std::mutex mtx;
-        static std::mutex __get_logger_mtx__;
+        std::mutex _mtx;
 #endif
     };
 
