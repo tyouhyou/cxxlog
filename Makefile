@@ -27,8 +27,7 @@ CLIBS		:= $(patsubst %,-L%, $(LIBDIRS:%/=%))
 DEBUG		:= -g -D_DEBUG
 SOURCES		:= $(wildcard $(SOURCEDIRS)/*.cpp)
 OBJECTS		:= $(SOURCES:.cpp=.o )
-EXFLAGS		:= -D_NOT_CLOSE_LOG
-#EXFLAGS		:= -D_NOT_CLOSE_LOG -D_LOG_LOCK -D_UNICODE
+EXFLAGS		:= -D_NOT_CLOSE_LOG -D_LOG_LOCK
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) $(EXFLAGS) $(DEBUG) $(CINCLUDES) -c $< -o $@

@@ -1,15 +1,17 @@
 #include <utility>
-#include "cxxlog.hpp"
+#include <locale>
+#include <codecvt>
+#include "../include/cxxlog.hpp"
 
 using namespace th_util;
 
-static std::vector<std::pair<tstring, std::shared_ptr<Log>>> __loggers__;
+static std::vector<std::pair<std::string, std::shared_ptr<Log>>> __loggers__;
 static std::shared_ptr<Log> __logger__;
 #ifdef _LOG_LOCK
 static std::mutex __get_logger_mtx__;
 #endif
 
-void Log::set_log_file(const tstring &file_name)
+void Log::set_log_file(const std::string &file_name)
 {
     auto ptr = new Log(file_name);
     __logger__ = std::shared_ptr<Log>(ptr);
@@ -20,16 +22,16 @@ std::shared_ptr<Log> Log::get_logger()
     return __logger__;
 }
 
-std::shared_ptr<Log> Log::get(const tstring &file_name)
+std::shared_ptr<Log> Log::get(const std::string &file_name)
 {
 #ifdef _LOG_LOCK
     std::lock_guard<std::mutex> lock(__get_logger_mtx__);
 #endif
 
-    std::pair<tstring, std::shared_ptr<Log>> mkv;
+    std::pair<std::string, std::shared_ptr<Log>> mkv;
     if (std::any_of(__loggers__.begin(),
                     __loggers__.end(),
-                    [file_name, &mkv](std::pair<tstring, std::shared_ptr<Log>> &kv) {
+                    [file_name, &mkv](std::pair<std::string, std::shared_ptr<Log>> &kv) {
                         mkv = kv;
                         return kv.first.compare(file_name) == 0;
                     }))
@@ -52,7 +54,7 @@ std::shared_ptr<Log> Log::get(const std::ostream &os)
     return p;
 }
 
-Log::Log(const tstring &file_name)
+Log::Log(const std::string &file_name)
 {
 #ifdef _NOT_CLOSE_LOG
     os = std::make_shared<std::ofstream>(file_name, std::ofstream::out | std::ofstream::app);
