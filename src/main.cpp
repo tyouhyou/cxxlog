@@ -1,5 +1,8 @@
+#include "cxxlog_ws.hpp"
 #include "cxxlog.hpp"
 #include "stopwatch.hpp"
+
+using namespace th_util;
 
 int main()
 {
@@ -29,6 +32,17 @@ int main()
     W << "warn to cerr";
     E << "error to cerr";
 
-    IE << "last 5 logs (to std::cerr) elasped: " << sw.perf() << " microseconds";
+    IE << "3rd 5 logs (to std::cerr) elasped: " << sw.perf() << " microseconds";
+
+    std::wstring file = L"test/ログ.log";
+    SET_LOG_FILE(file);
+
+    std::wstring b = L"バグ";
+    LD(b);
+    LI(L"info");
+    LW(L"ワーニング");
+    LE(L"ｅＲｒor");
+
+    IE << "4th logs elasped: " << sw.perf() << " microseconds";
     IE << "lap: " << sw.lap() << " microseconds.";
 }
