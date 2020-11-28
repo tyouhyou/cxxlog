@@ -20,31 +20,31 @@
 #define __FILENAME__ strrchr(__PATH_SEP_STR__ __FILE__, __PATH_SEP_CHR__) + 1
 #define __CODE_INFO__ "[" << __FILENAME__ << "(" << __func__ << ")(" << __LINE__ << ")]"
 
-#define SET_LOG_FILE(f) th_util::logger::set_log_file(f)
+#define SET_LOG_FILE(f) th_util::wlogger::set_log_file(f)
 
 #if defined(DEBUG) || defined(_DEBUG)
-#define LD(log)                       \
-    {                                 \
-        std::wstringstream ss;        \
-        ss << __CODE_INFO__;          \
-        logger::Debug(log, ss.str()); \
+#define LD(log)                        \
+    {                                  \
+        std::wstringstream ss;         \
+        ss << __CODE_INFO__;           \
+        wlogger::Debug(log, ss.str()); \
     }
 #else
 #define LD(log)
 #endif
-#define LI(log) logger::Info(log)
-#define LW(log) logger::Warn(log)
-#define LE(log)                       \
-    {                                 \
-        std::wstringstream ss;        \
-        ss << __CODE_INFO__;          \
-        logger::Error(log, ss.str()); \
+#define LI(log) wlogger::Info(log)
+#define LW(log) wlogger::Warn(log)
+#define LE(log)                        \
+    {                                  \
+        std::wstringstream ss;         \
+        ss << __CODE_INFO__;           \
+        wlogger::Error(log, ss.str()); \
     }
 
 namespace th_util
 {
 
-    class logger
+    class wlogger
     {
     public:
         static void set_log_file(std::wstring logfile);

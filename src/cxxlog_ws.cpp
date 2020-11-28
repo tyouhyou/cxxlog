@@ -1,36 +1,36 @@
 #include <locale>
 #include <codecvt>
-#include ".cxxlog_ws.hpp"
+#include "cxxlog_ws.hpp"
 
 using namespace th_util;
 
 #if defined(_MSC_VER)
-std::wstring logger::log_file;
+std::wstring wlogger::log_file;
 #else
-std::string logger::log_file;
+std::string wlogger::log_file;
 #endif
 
-std::mutex logger::mtx;
+std::mutex wlogger::mtx;
 
-void logger::set_log_file(std::wstring logfile)
+void wlogger::set_log_file(std::wstring logfile)
 {
-    std::lock_guard<std::mutex> lck(logger::mtx);
+    std::lock_guard<std::mutex> lck(wlogger::mtx);
     std::locale::global(std::locale(""));
 #if defined(_MSC_VER)
-    logger::log_file = logfile;
+    wlogger::log_file = logfile;
 #else
     std::string s = std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(logfile);
-    logger::log_file = s;
+    wlogger::log_file = s;
 #endif
 }
 
-void logger::V(const std::wstring &log, const std::wstring &lv, const std::wstring &code_info)
+void wlogger::V(const std::wstring &log, const std::wstring &lv, const std::wstring &code_info)
 {
     try
     {
-        std::lock_guard<std::mutex> lck(logger::mtx);
+        std::lock_guard<std::mutex> lck(wlogger::mtx);
 
-        if (logger::log_file.empty())
+        if (wlogger::log_file.empty())
             return;
 
         std::wofstream ofs;
@@ -49,7 +49,7 @@ void logger::V(const std::wstring &log, const std::wstring &lv, const std::wstri
     }
 }
 
-std::wstring logger::get_cur_datetime()
+std::wstring wlogger::get_cur_datetime()
 {
     auto d = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     std::tm buf;
