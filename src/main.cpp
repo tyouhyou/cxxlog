@@ -1,4 +1,3 @@
-#include "cxxlog_ws.hpp"
 #include "cxxlog.hpp"
 #include "stopwatch.hpp"
 
@@ -7,42 +6,29 @@ using namespace th_util;
 int main()
 {
     th_util::StopWatch sw;
+    SET_LOGFILE("test/log.txt");
+
     sw.start();
 
-    VF("test/info.log") << "verbose" << std::endl;
+    D << "Here you are, BUG.";
+    I << "Let me inform you.";
+    W << "Alert, paradise is falling";
+    E << "OMG, it crashed.";
+
+    IE << "first 4 logs elasped: " << sw.perf() << " microseconds";
+
     DF("test/debug.log") << "This is debug message.";
     IF("test/info.log") << "Information for you.";
     WF("test/warn.log") << "I warn you.";
     EF("test/error.log") << "An error message goes here.";
 
-    IE << "first 5 logs elasped: " << sw.perf() << " microseconds";
+    IE << "second 4 logs elasped: " << sw.perf() << " microseconds";
 
-    VF("test/info2.log") << "verbose again." << std::endl;
     DF("test/debug2.log") << "This is debug message again.";
     IF("test/info2.log") << "Information for you again.";
     WF("test/warn2.log") << "I warn you again.";
     EF("test/error2.log") << "An error message goes here again.";
 
-    IE << "second 5 logs elasped: " << sw.perf() << " microseconds";
-
-    SET_LOGGER("test/oo.log");
-    V << "verbose" << std::endl;
-    D << "debug to cerr";
-    I << "info to cerr";
-    W << "warn to cerr";
-    E << "error to cerr";
-
-    IE << "3rd 5 logs (to std::cerr) elasped: " << sw.perf() << " microseconds";
-
-    std::wstring file = L"test/ログ.log";
-    SET_LOG_FILE(file);
-
-    std::wstring b = L"バグ";
-    LD(b);
-    LI(L"info");
-    LW(L"ワーニング");
-    LE(L"ｅＲｒor");
-
-    IE << "4th logs elasped: " << sw.perf() << " microseconds";
+    IE << "third 4 logs elasped: " << sw.perf() << " microseconds";
     IE << "lap: " << sw.lap() << " microseconds.";
 }

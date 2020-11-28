@@ -35,12 +35,10 @@
 #define _OUTPUT_LOG(loglevel, msg_w_fmt, ...)                           \
     do                                                                  \
     {                                                                   \
-        fprintf(stderr, loglevel "[%s(%d)::%s][%s:%s] " msg_w_fmt "\n", \
+        fprintf(stderr, loglevel "[%s(%d)::%s] " msg_w_fmt "\n",        \
                 __FILENAME__,                                           \
                 __LINE__,                                               \
                 __func__,                                               \
-                __DATE__,                                               \
-                __TIME__,                                               \
                 ##__VA_ARGS__);                                         \
     } while (0)
 
