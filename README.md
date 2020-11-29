@@ -52,7 +52,7 @@ The usage and outputting is the same as DL/IF/WF/EF macros except that SET_LOGFI
 
 Also, if no file specified, or the path is not correct, no execption occurres.
 
-DF/IF/WF/EF are not thread safe. You may implement it if that is desired. The reason non-thread-safe version is designed, is that it faster than the thread-safe one. In my test environments, non-thread-safe one is 2~4 times faster. And also the provide flexibility when multiple logs are expected in one application or library.
+DF/IF/WF/EF are not thread safe. You may implement it if that is desired. The reason non-thread-safe version is designed, is that it's a bit faster than the thread-safe one. And also the provide flexibility when multiple logs are expected in one application or library.
 
 There has a trick to use the DF/IF/WF/EF ones.
 

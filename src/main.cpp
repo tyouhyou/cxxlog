@@ -11,10 +11,10 @@ int main()
 
     sw.start();
 
-    D << "Here you are, BUG.";
-    I << "Let me inform you.";
-    W << "Alert, paradise is falling";
-    E << "OMG, it crashed.";
+    DL << "Here you are, BUG.";
+    IL << "Let me inform you.";
+    WL << "Alert, paradise is falling";
+    EL << "OMG, it crashed.";
 
     IE << "The first 4 logs elasped: " << sw.perf() << " microseconds";
 
