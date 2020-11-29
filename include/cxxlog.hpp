@@ -55,7 +55,7 @@
 #endif
 
 #define __FILENAME__ strrchr(__PATH_SEP_STR__ __FILE__, __PATH_SEP_CHR__) + 1
-#define __CODE_INFO__ "[" << __FILENAME__ << "(" << __func__ << ")(" << __LINE__ << ")]"
+#define __CODE_INFO__ "[" << __FILENAME__ << "::" << __func__ << "(" << __LINE__ << ")]"
 
 #define _V(lv, lg)      \
     if (LOG_LEVEL > lv) \
@@ -102,20 +102,20 @@
 
 #define SET_LOGFILE(f) th_util::logger::set_g_log_file(f)
 
-#define D _VC(_LOG_DEBUG, *th_util::logger::get_g_logger(nullptr, "[DEBUG]"))
-#define I _V(_LOG_INFO, *th_util::logger::get_g_logger(nullptr, "[INFO ]"))
-#define W _V(_LOG_WARN, *th_util::logger::get_g_logger(nullptr, "[WARN ]"))
-#define E _VC(_LOG_ERROR, *th_util::logger::get_g_logger(nullptr, "[ERROR]"))
-
-#define DE _VEC(_LOG_DEBUG, "[DEBUG]")
-#define IE _VE(_LOG_INFO, "[INFO ]")
-#define WE _VE(_LOG_WARN, "[WARN ]")
-#define EE _VEC(_LOG_ERROR, "[ERROR]")
+#define DL _VC(_LOG_DEBUG, *th_util::logger::get_g_logger(nullptr, "[DEBUG]"))
+#define IL _V(_LOG_INFO, *th_util::logger::get_g_logger(nullptr, "[INFO ]"))
+#define WL _V(_LOG_WARN, *th_util::logger::get_g_logger(nullptr, "[WARN ]"))
+#define EL _VC(_LOG_ERROR, *th_util::logger::get_g_logger(nullptr, "[ERROR]"))
 
 #define DF(f) _VFC(f, _LOG_DEBUG, "[DEBUG]")
 #define IF(f) _VF(f, _LOG_INFO, "[INFO ]")
 #define WF(f) _VF(f, _LOG_WARN, "[WARN ]")
 #define EF(f) _VFC(f, _LOG_ERROR, "[ERROR]")
+
+#define DE _VEC(_LOG_DEBUG, "[DEBUG]")
+#define IE _VE(_LOG_INFO, "[INFO ]")
+#define WE _VE(_LOG_WARN, "[WARN ]")
+#define EE _VEC(_LOG_ERROR, "[ERROR]")
 
 #pragma endregion
 
@@ -171,13 +171,15 @@ namespace th_util
         }
 
         logger(const std::string &logfile, const std::string &loglevel)
-            : log_file{logfile}, log_level{loglevel}
+            : log_file{logfile}, log_level{loglevel}, log_lock{}
         {
+            // TODO: check if folder exist. If not, empty string to log file path.
         }
 
         logger(const std::string &logfile, const std::string &loglevel, const std::shared_ptr<std::mutex> &locker)
             : log_file{logfile}, log_level{loglevel}, log_lock{locker}
         {
+            // TODO: check if folder exist. If not, empty string to log file path.
         }
 
         template <typename T>
@@ -200,7 +202,8 @@ namespace th_util
             if (logger::log_file.empty())
                 return;
 
-            std::lock_guard<std::mutex> lck(*this->log_lock);
+            if (log_lock)
+                log_lock->lock();
             try
             {
                 std::ofstream ofs;
@@ -216,6 +219,8 @@ namespace th_util
             {
                 // DO NOTHING
             }
+            if (log_lock)
+                log_lock->unlock();
         }
 
     private:
