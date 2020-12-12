@@ -20,13 +20,13 @@ EL << "Error! => " << e.what();
 All these logs will be output to log.txt file.
 
 ```txt
-[2020-05-03, 13:28:54][DEBUG][main.cpp::main(4)] - This is debug message. i=2
+[2020-05-03, 13:28:54][DEBUG][main.cpp(4)::main] - This is debug message. i=2
 [2020-05-03, 13:28:54][INFO ] - For your information.
 [2020-05-03, 13:28:54][WARN ] - Caution!
-[2020-05-03, 13:28:54][ERROR][main.cpp::main(7)] - Error! => exception message.
+[2020-05-03, 13:28:54][ERROR][main.cpp(7)::main] - Error! => exception message.
 ```
 
-*As you might notice, the DEBUG and ERROR logs have code information, that is "[file_name::method_name(line)". While INFO/WARN logs do not have such information.*
+_As you might notice, the DEBUG and ERROR logs have code information, that is "[file_name(line)::method_name". While INFO/WARN logs do not have such information._
 
 _**Support**_
 
@@ -76,30 +76,24 @@ Four log levels defined.
 #define _LOG_ERROR 4
 ```
 
-To contorl which (and above) level's log could be output, define ```LOG_LEVEL``` micro during compilation or in header file. Only those logs whose level is equal to or greater than ```LOG_LEVEL```, will be written to file. The lower level logs are overlooked.
+To contorl which (and above) level's log could be output, define `LOG_LEVEL` micro during compilation or in header file. Only those logs whose level is equal to or greater than `LOG_LEVEL`, will be written to file. The lower level logs are overlooked.
 
-For instance, when set ```LOG_LEVEL``` to "_LOG_INFO", the DEBUG level(DL / DE / DF) macros will be quiet. And ```LOG_LEVEL``` is set to "_LOG_WARN", DEBUG and INFO logs shut up.
+For instance, when set `LOG_LEVEL` to "\_LOG_INFO", the DL/DE/DF macros will be quiet. Set `LOG_LEVEL` to "\_LOG_WARN", DEBUG and INFO logs shut up.
 
-If no ```LOG_LEVEL``` is defined, the default one will be taken into effect. That is, when ```DEBUG``` or ```_DEBUG``` macro is defined, the default log level is "_LOG_DEBUG", otherwise, it's "_LOG_INFO".
+If no `LOG_LEVEL` is defined, default value will be taken into effect. When `DEBUG` or `_DEBUG` macro is defined, the default log level is "\_LOG_DEBUG", otherwise, it's "\_LOG_INFO".
 
-****
+---
 
-# cxxlog_ws.hpp
+# wstring support on windows
 
-At this time being, strings in cxxlog.hpp are of std::string. If std::wstring is desired. Use cxxlog_ws.hpp. However the usage is a bit different.
+By adding '''#define \_WLOGGER''' or define \_WLOGGER on compile command line, std::wstring can be used with the logger. 
 
-``` c++11
-#include "cxxlog_ws.hpp"
-/* thread safe */
-D(L"debug");
-I(L"info");
-W("warn");
-E("error");
-```
+However, this is just for using on Windows. On linux, doing like this may cause build error at std::wofstream.open().
+And I don't think use wstring on linux is a good idea, so just left it unfixed.
 
-It has been tested on Windows. Maybe cxxlog.hpp should take care of std::wstring too. (TODO list ?)
+Just do not use \_WLOGGER on linux.
 
-****
+---
 
 # clog.h
 
@@ -120,6 +114,6 @@ They somehow look like fprintf. The pros over fprintf are:
 
 And all the messages are written to std::cerr. If outputting to file is desired, use redirect can send all logs to the re-directed file.
 
-****
+---
 
 Any bug reporting and suggestion is welcome. Thanks in advance.

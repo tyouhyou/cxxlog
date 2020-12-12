@@ -32,14 +32,14 @@
 
 #define __FILENAME__ (strrchr("/" __FILE__, '/') + 1)
 
-#define _OUTPUT_LOG(loglevel, msg_w_fmt, ...)                           \
-    do                                                                  \
-    {                                                                   \
-        fprintf(stderr, loglevel "[%s(%d)::%s] " msg_w_fmt "\n",        \
-                __FILENAME__,                                           \
-                __LINE__,                                               \
-                __func__,                                               \
-                ##__VA_ARGS__);                                         \
+#define _OUTPUT_LOG(loglevel, msg_w_fmt, ...)                    \
+    do                                                           \
+    {                                                            \
+        fprintf(stderr, loglevel "[%s(%d)::%s] " msg_w_fmt "\n", \
+                __FILENAME__,                                    \
+                __LINE__,                                        \
+                __func__,                                        \
+                ##__VA_ARGS__);                                  \
     } while (0)
 
 #if (LOG_LEVEL <= _LOG_DEBUG)

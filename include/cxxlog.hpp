@@ -22,8 +22,31 @@
 #include <ctime>
 #include <iomanip>
 #include <mutex>
+#include <locale>
 
 #pragma endregion
+
+/**
+ * _WLOGGER macro is for using with std::wstring / std::wofstream on windows.
+ * Do not define this macro on linux, otherwise compile error may occur.
+ * I do not think to use wchar on linux is a good idea, so left this issue unfixed.
+ * */
+#if defined(_WLOGGER)
+#define __t_string std::wstring
+#define __t_ofstream std::wofstream
+#define __t_stringstream std::wstringstream
+#define __t(str) L##str
+#else
+#define __t_string std::string
+#define __t_ofstream std::ofstream
+#define __t_stringstream std::stringstream
+#define __t(str) str
+#endif
+
+#define __sd __t("[DEBUG]")
+#define __si __t("[INFO ]")
+#define __sw __t("[WARN ]")
+#define __se __t("[ERROR]")
 
 #pragma region : log leve defines.set LOG_LEVEL macro during compilation or before use log macros, if needed.
 
@@ -55,67 +78,67 @@
 #endif
 
 #define __FILENAME__ strrchr(__PATH_SEP_STR__ __FILE__, __PATH_SEP_CHR__) + 1
-#define __CODE_INFO__ "[" << __FILENAME__ << "::" << __func__ << "(" << __LINE__ << ")]"
+#define __CODE_INFO__ __t("[") << __FILENAME__ << __t("(") << __LINE__ << __t(")") << __t("::") << __func__ << __t("]")
 
-#define _V(lv, lg)      \
+#define _VL(lv, lg)     \
     if (LOG_LEVEL > lv) \
     {                   \
     }                   \
     else                \
-        (lg) << " - "
-#define _VC(lv, lg)     \
+        (lg) << __t(" ")
+#define _VLC(lv, lg)    \
     if (LOG_LEVEL > lv) \
     {                   \
     }                   \
     else                \
-        (lg) << __CODE_INFO__ << " - "
+        (lg) << __CODE_INFO__ << __t(" ")
 
 #define _VF(f, lv, lvstr) \
     if (LOG_LEVEL > lv)   \
     {                     \
     }                     \
     else                  \
-        (th_util::logger(f, lvstr)) << " - "
+        (th_util::logger(f, lvstr)) << __t(" ")
 #define _VFC(f, lv, lvstr) \
     if (LOG_LEVEL > lv)    \
     {                      \
     }                      \
     else                   \
-        (th_util::logger(f, lvstr)) << __CODE_INFO__ << " - "
+        (th_util::logger(f, lvstr)) << __CODE_INFO__ << __t(" ")
 
 #define _VE(lv, lvstr)  \
     if (LOG_LEVEL > lv) \
     {                   \
     }                   \
     else                \
-        (th_util::ender(std::cerr), std::cerr << th_util::util::get_cur_datetime()) << lvstr << " - "
+        (th_util::ender(std::cerr), std::cerr << th_util::util::get_cur_datetime()) << lvstr << __t(" ")
 #define _VEC(lv, lvstr) \
     if (LOG_LEVEL > lv) \
     {                   \
     }                   \
     else                \
-        (th_util::ender(std::cerr), std::cerr << th_util::util::get_cur_datetime()) << lvstr << __CODE_INFO__ << " - "
+        (th_util::ender(std::cerr), std::cerr << th_util::util::get_cur_datetime()) << lvstr << __CODE_INFO__ << __t(" ")
 
 #pragma endregion
 
 #pragma region : macros outputting logs.USE THE MACROS DEFINED IN THIS REGION ONLY.
 
-#define SET_LOGFILE(f) th_util::logger::set_g_log_file(f)
+#define SET_LOG_FILE(f) th_util::logger::set_g_log_file(f)
 
-#define DL _VC(_LOG_DEBUG, *th_util::logger::get_g_logger(nullptr, "[DEBUG]"))
-#define IL _V(_LOG_INFO, *th_util::logger::get_g_logger(nullptr, "[INFO ]"))
-#define WL _V(_LOG_WARN, *th_util::logger::get_g_logger(nullptr, "[WARN ]"))
-#define EL _VC(_LOG_ERROR, *th_util::logger::get_g_logger(nullptr, "[ERROR]"))
+#define DL _VLC(_LOG_DEBUG, *th_util::logger::get_g_logger(nullptr, __sd))
+#define IL _VL(_LOG_INFO, *th_util::logger::get_g_logger(nullptr, __si))
+#define WL _VL(_LOG_WARN, *th_util::logger::get_g_logger(nullptr, __sw))
+#define EL _VLC(_LOG_ERROR, *th_util::logger::get_g_logger(nullptr, __se))
 
-#define DF(f) _VFC(f, _LOG_DEBUG, "[DEBUG]")
-#define IF(f) _VF(f, _LOG_INFO, "[INFO ]")
-#define WF(f) _VF(f, _LOG_WARN, "[WARN ]")
-#define EF(f) _VFC(f, _LOG_ERROR, "[ERROR]")
+#define DF(f) _VFC(f, _LOG_DEBUG, __sd)
+#define IF(f) _VF(f, _LOG_INFO, __si)
+#define WF(f) _VF(f, _LOG_WARN, __sw)
+#define EF(f) _VFC(f, _LOG_ERROR, __se)
 
-#define DE _VEC(_LOG_DEBUG, "[DEBUG]")
-#define IE _VE(_LOG_INFO, "[INFO ]")
-#define WE _VE(_LOG_WARN, "[WARN ]")
-#define EE _VEC(_LOG_ERROR, "[ERROR]")
+#define DE _VEC(_LOG_DEBUG, __sd)
+#define IE _VE(_LOG_INFO, __si)
+#define WE _VE(_LOG_WARN, __sw)
+#define EE _VEC(_LOG_ERROR, __se)
 
 #pragma endregion
 
@@ -126,7 +149,7 @@ namespace th_util
     class util
     {
     public:
-        static std::string get_cur_datetime()
+        static __t_string get_cur_datetime()
         {
             auto dat = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
             std::tm buf;
@@ -135,8 +158,8 @@ namespace th_util
 #else
             localtime_r(&dat, &buf);
 #endif
-            std::stringstream ss;
-            ss << std::put_time(&buf, "[%Y-%m-%d, %H:%M:%S]");
+            __t_stringstream ss;
+            ss << std::put_time(&buf, __t("[%Y-%m-%d, %H:%M:%S]"));
             return ss.str();
         }
     };
@@ -144,7 +167,7 @@ namespace th_util
     class logger
     {
     public:
-        static void set_g_log_file(const std::string &file)
+        static void set_g_log_file(const __t_string &file)
         {
             if (file.empty())
                 return;
@@ -152,9 +175,9 @@ namespace th_util
             get_g_logger(&file);
         }
 
-        static std::shared_ptr<logger> get_g_logger(const std::string *file = nullptr, const std::string &lvstr = "")
+        static std::shared_ptr<logger> get_g_logger(const __t_string *file = nullptr, const __t_string &lvstr = __t(""))
         {
-            static std::string _g_log_file;
+            static __t_string _g_log_file;
             static std::shared_ptr<std::mutex> _g_log_locker;
 
             if (nullptr != file && !file->empty())
@@ -170,16 +193,17 @@ namespace th_util
             return lg;
         }
 
-        logger(const std::string &logfile, const std::string &loglevel)
+        logger(const __t_string &logfile, const __t_string &loglevel)
             : log_file{logfile}, log_level{loglevel}, log_lock{}
         {
-            // TODO: check if folder exist. If not, empty string to log file path.
+            std::locale::global(std::locale(""));
+            // TODO ? check if folder exist. If not, empty string to log file path .
         }
 
-        logger(const std::string &logfile, const std::string &loglevel, const std::shared_ptr<std::mutex> &locker)
-            : log_file{logfile}, log_level{loglevel}, log_lock{locker}
+        logger(const __t_string &logfile, const __t_string &loglevel, const std::shared_ptr<std::mutex> &locker)
+            : logger(logfile, loglevel)
         {
-            // TODO: check if folder exist. If not, empty string to log file path.
+            log_lock = {locker};
         }
 
         template <typename T>
@@ -206,7 +230,7 @@ namespace th_util
                 log_lock->lock();
             try
             {
-                std::ofstream ofs;
+                __t_ofstream ofs;
                 ofs.open(log_file, std::ofstream::out | std::ofstream::app | std::ios::binary);
                 ofs.imbue(std::locale());
                 ofs << util::get_cur_datetime()
@@ -230,9 +254,9 @@ namespace th_util
         logger &operator=(const logger &) = delete;
         logger &operator=(const logger &&) = delete;
 
-        std::string log_file;
-        std::string log_level;
-        std::stringstream ss;
+        __t_string log_file;
+        __t_string log_level;
+        __t_stringstream ss;
         std::shared_ptr<std::mutex> log_lock;
     };
 
