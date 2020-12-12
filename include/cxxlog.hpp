@@ -1,6 +1,6 @@
 /* *
  * A simple log utility for c++ projects (c++11 and later).
- * 
+ *
  * @author  tyouhyou    github.com/tyouhyou
  * */
 
@@ -28,17 +28,19 @@
 #pragma endregion
 
 /**
- * _WLOGGER macro is for using with std::wstring / std::wofstream on windows.
- * Do not define this macro on linux, otherwise compile error may occur.
- * I do not think to use wchar on linux is a good idea, so left this issue unfixed.
- * */
+  * _WLOGGER macro is for using with std::wstring / std::wofstream on windows.
+  * Do not define this macro on linux, otherwise compile error may occur.
+  * I do not think to use wchar on linux is a good idea, so left this issue unfixed.
+  * */
 #if defined(_WLOGGER)
+#define __t_char wchar_t
 #define __t_string std::wstring
 #define __t_ifstream std::wifstream
 #define __t_ofstream std::wofstream
 #define __t_stringstream std::wstringstream
 #define __t(str) L##str
 #else
+#define __t_char char
 #define __t_string std::string
 #define __t_ifstream std::ifstream
 #define __t_ofstream std::ofstream
@@ -153,9 +155,9 @@ namespace th_util
             get_g_logger(&file);
         }
 
-        static uint get_log_max_size(const uint &max_size = 0)
+        static unsigned int get_log_max_size(const unsigned int &max_size = 0)
         {
-            static uint _g_log_file_size = 0;
+            static unsigned int _g_log_file_size = 0;
             if (max_size > 0)
             {
                 _g_log_file_size = max_size;
@@ -214,14 +216,16 @@ namespace th_util
             {
                 auto max_size = get_log_max_size();
                 __t_stringstream iss;
+                int replaceln = 0;
                 if (max_size > 0)
                 {
                     __t_ifstream ifs(log_file);
-                    auto linesize = std::count(std::istreambuf_iterator<char>(ifs),
-                                               std::istreambuf_iterator<char>(), '\n');
+                    auto linesize = std::count(std::istreambuf_iterator<__t_char>(ifs),
+                                               std::istreambuf_iterator<__t_char>(), '\n');
                     ifs.seekg(0);
                     __t_string ln;
-                    for (int i = 0; i < linesize - max_size + 1; i++)
+                    replaceln = linesize - max_size + 1;
+                    for (int i = 0; i < replaceln; i++)
                     {
                         std::getline(ifs, ln);
                     }
@@ -229,14 +233,20 @@ namespace th_util
                     ifs.close();
                 }
 
-                iss << util::get_cur_datetime()
+                __t_ofstream ofs;
+                ofs.imbue(std::locale());
+                if (replaceln > 0)
+                {
+                    ofs.open(log_file, std::ofstream::out | std::ofstream::trunc | std::ios::binary);
+                    ofs << iss.rdbuf();
+                }
+                else
+                {
+                    ofs.open(log_file, std::ofstream::out | std::ofstream::app | std::ios::binary);
+                }
+                ofs << util::get_cur_datetime()
                     << ss.str()
                     << std::endl;
-
-                __t_ofstream ofs;
-                ofs.open(log_file, std::ofstream::out | std::ofstream::trunc | std::ios::binary);
-                ofs.imbue(std::locale());
-                ofs << iss.rdbuf();
                 ofs.close();
             }
             catch (...)

@@ -21,10 +21,17 @@ void test_wlogger()
     sw.start();
 
     SET_LOG_FILE(L"test/ログ.txt");
+    SET_LOG_MAX_SIZE(0);
+
     DL << L"バグ";
     IL << L"Info";
     WL << L"警告";
     EL << L"エラー";
+
+    DF(L"test/log.txt") << L"バグ";
+    IF(L"test/log.txt") << L"Info";
+    WF(L"test/log.txt") << L"警告";
+    EF(L"test/log.txt") << L"エラー";
 
     std::cerr << "elapsed: " << sw.elaspsed() << " microseconds.";
 #endif

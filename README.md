@@ -9,6 +9,7 @@ It is easy to output logs to any specified log file(s) or std::cerr by including
 
 /* Specify the log path, both absolute and relative are OK. */
 SET_LOG_FILE("test/log.txt");
+SET_LOG_MAX_SIZE(10000);        // The max lines in one log file.
 
 /* thread safe */
 DL << "This is debug message. i=" << i;
@@ -65,6 +66,10 @@ DFM << "buf information";
 
 And, there has a third set of macros, DE/IE/WE/EE allow you write logs to std::cerr.
 
+## Max lines in one log file
+
+`SET_LOG_MAX_SIZE(line_number);` can specify the max lines in one log file. If the max number has reached, the first line will be removed and the new one be appended to the end of the file. 0 or not specified means not max limit. Take care.
+
 ## Log levels
 
 Four log levels defined.
@@ -86,7 +91,7 @@ If no `LOG_LEVEL` is defined, default value will be taken into effect. When `DEB
 
 # wstring support on windows
 
-By adding '''#define \_WLOGGER''' or define \_WLOGGER on compile command line, std::wstring can be used with the logger. 
+By adding '''#define \_WLOGGER''' or define \_WLOGGER on compile command line, std::wstring can be used with the logger.
 
 However, this is just for using on Windows. On linux, doing like this may cause build error at std::wofstream.open().
 And I don't think use wstring on linux is a good idea, so just left it unfixed.
