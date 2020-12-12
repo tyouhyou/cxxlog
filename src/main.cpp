@@ -37,11 +37,17 @@ void test_logger()
     th_util::StopWatch sw;
     sw.start();
 
-    SET_LOG_FILE("test/log.txt");
+    SET_LOG_FILE("test/ログ.txt");
+    SET_LOG_MAX_SIZE(20);
+
     DL << "Here you are, BUG.";
     IL << "Let me inform you.";
     WL << "Alert, paradise is falling";
     EL << "OMG, it crashed.";
+    DL << "バグ";
+    IL << "Info";
+    WL << "警告";
+    EL << "エラー";
 
     IE << "The first 4 logs elasped: " << sw.wrap() << " microseconds";
 
@@ -59,10 +65,10 @@ void test_logger()
 
     IE << "The third 4 logs elasped: " << sw.wrap() << " microseconds";
 
-    DF("test/ログ.txt") << "バグ";
-    IF("test/ログ.txt") << "Info";
-    WF("test/ログ.txt") << "警告";
-    EF("test/ログ.txt") << "エラー";
+    DF("test/log.txt") << "バグ";
+    IF("test/log.txt") << "Info";
+    WF("test/log.txt") << "警告";
+    EF("test/log.txt") << "エラー";
 
     IE << "lap: " << sw.elaspsed() << " microseconds.";
 

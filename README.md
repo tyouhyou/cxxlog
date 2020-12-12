@@ -8,7 +8,7 @@ It is easy to output logs to any specified log file(s) or std::cerr by including
 #include cxxlog.hpp
 
 /* Specify the log path, both absolute and relative are OK. */
-SET_LOGFILE("test/log.txt");
+SET_LOG_FILE("test/log.txt");
 
 /* thread safe */
 DL << "This is debug message. i=" << i;
@@ -20,10 +20,10 @@ EL << "Error! => " << e.what();
 All these logs will be output to log.txt file.
 
 ```txt
-[2020-05-03, 13:28:54][DEBUG][main.cpp(4)::main] - This is debug message. i=2
-[2020-05-03, 13:28:54][INFO ] - For your information.
-[2020-05-03, 13:28:54][WARN ] - Caution!
-[2020-05-03, 13:28:54][ERROR][main.cpp(7)::main] - Error! => exception message.
+[2020-05-03, 13:28:54][DEBUG][main.cpp(4)::main] This is debug message. i=2
+[2020-05-03, 13:28:54][INFO ] For your information.
+[2020-05-03, 13:28:54][WARN ] Caution!
+[2020-05-03, 13:28:54][ERROR][main.cpp(7)::main] Error! => exception message.
 ```
 
 _As you might notice, the DEBUG and ERROR logs have code information, that is "[file_name(line)::method_name". While INFO/WARN logs do not have such information._
@@ -36,7 +36,7 @@ c++11 and above.
 
 With the macros shown above, writting log can be fulfilled in an "iostream style". And, std::endl will be add to the end of the line automatically.
 
-Before log can be output, the log file path should be specified via SET_LOGFILE(path). The path can be relative or absolute. But the folder should be an existing one. If any folder in the specified file path does ont exist, it will not be created, thus, logs cannot be written, and no exception will be thrown. Even writting is performed before file path setting, it causes no exception.
+Before log can be output, the log file path should be specified via SET_LOG_FILE(path). The path can be relative or absolute. But the folder should be an existing one. If any folder in the specified file path does ont exist, it will not be created, thus, logs cannot be written, and no exception will be thrown. Even writting is performed before file path setting, it causes no exception.
 
 Usually one application or library use only one log file. In case multiple files are desired, there have another set of macros to fullfill it.
 
@@ -48,7 +48,7 @@ WF(file) << "warn";
 EF(file) << "error";
 ```
 
-The usage and outputting is the same as DL/IF/WF/EF macros except that SET_LOGFILE() has no effect on these macros. The file path set by SET_LOGFILE() just be applied to DL/IL/WL/EL macros.
+The usage and outputting is the same as DL/IL/WL/EL macros except that SET_LOG_FILE() has no effect on these macros. The file path set by SET_LOG_FILE() just be applied to DL/IL/WL/EL macros.
 
 Also, if no file specified, or the path is not correct, no execption occurres.
 
