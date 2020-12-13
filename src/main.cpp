@@ -56,28 +56,23 @@ void test_logger()
     WL << "警告";
     EL << "エラー";
 
-    IE << "The first 4 logs elasped: " << sw.wrap() << " microseconds";
+    IE << "The first group elasped: " << sw.wrap() << " microseconds";
 
     DF("test/debug.log") << "This is debug message.";
     IF("test/info.log") << "Information for you.";
     WF("test/warn.log") << "I warn you.";
     EF("test/error.log") << "An error message goes here.";
 
-    IE << "The second 4 logs elasped: " << sw.wrap() << " microseconds";
-
-    DF("test/debug2.log") << "This is debug message again.";
-    IF("test/info2.log") << "Information for you again.";
-    WF("test/warn2.log") << "I warn you again.";
-    EF("test/error2.log") << "An error message goes here again.";
-
-    IE << "The third 4 logs elasped: " << sw.wrap() << " microseconds";
+    IE << "The second group elasped: " << sw.wrap() << " microseconds";
 
     DF("test/log.txt") << "バグ";
     IF("test/log.txt") << "Info";
     WF("test/log.txt") << "警告";
     EF("test/log.txt") << "エラー";
 
-    IE << "lap: " << sw.elaspsed() << " microseconds.";
+    IE << "The third group elasped: " << sw.wrap() << " microseconds";
+
+    IE << "Totally: " << sw.elaspsed() << " microseconds.";
 
 #endif
 }

@@ -1,78 +1,93 @@
-# cxxlog.hpp
+# Logging utilities
 
-## TL;NR
+In this toolkit, there have loggers for c, c++11, and a stopwatch.
 
-It is easy to output logs to any specified log file(s) or std::cerr by including this header file, as follows:
+They are implemented in separate header files, in [include] folder. Just include the one you desire and have fun.
+
+## cxxlog.hpp
+
+### TL;NR
+
+It is easy to write log in "stream style", to any specified log file(s) or std::cerr by including this header file.
 
 ```c++11
 #include cxxlog.hpp
 
-/* Specify the log path, both absolute and relative are OK. */
-SET_LOG_FILE("test/log.txt");
+SET_LOG_FILE("test/log.txt");   // Specify log path for using with DL/IL/WL/EL
 SET_LOG_MAX_SIZE(10000);        // The max lines in one log file.
 
-/* thread safe */
+/* The macros below are of thread-safe */
 DL << "This is debug message. i=" << i;
 IL << "For your information. x=" << foo << "; y=" << bar;
 WL << "Caution!";
 EL << "Error! => " << e.what();
 ```
 
-All these logs will be output to log.txt file.
+All these logs will be output to [test/log.txt] file, as follows:
 
-```txt
+```outputting sample
 [2020-05-03, 13:28:54][DEBUG][main.cpp(4)::main] This is debug message. i=2
 [2020-05-03, 13:28:54][INFO ] For your information.
 [2020-05-03, 13:28:54][WARN ] Caution!
 [2020-05-03, 13:28:54][ERROR][main.cpp(7)::main] Error! => exception message.
 ```
 
-_As you might notice, the DEBUG and ERROR logs have code information, that is "[file_name(line)::method_name". While INFO/WARN logs do not have such information._
-
 _**Support**_
 
 c++11 and above.
 
-## Introduction
+### Introduction
 
-With the macros shown above, writting log can be fulfilled in an "iostream style". And, std::endl will be add to the end of the line automatically.
+There have 3 groups of macros for logging.
 
-Before log can be output, the log file path should be specified via SET_LOG_FILE(path). The path can be relative or absolute. But the folder should be an existing one. If any folder in the specified file path does ont exist, it will not be created, thus, logs cannot be written, and no exception will be thrown. Even writting is performed before file path setting, it causes no exception.
+- DL/IL/WL/EL
+- DF/IF/WF/EF
+- DE/IE/WE/EE
 
-Usually one application or library use only one log file. In case multiple files are desired, there have another set of macros to fullfill it.
+```remark
+"Dx" - DEBUG level logs.
+"Ix" - INFO level logs.
+"Wx" - WARN level logs.
+"Ex" - ERROR level logs.
 
-```c++11
+the DEBUG and ERROR logs have code information, that is the "[file_name(line)::method_name]" portion of the above outputting sample.
+While INFO/WARN logs do not have such information.
+
+And, std::endl will be add to the end of the line automatically.
+```
+
+DL/IL/WL/EL should be used with SET_LOG_FILE(), which set the log file path for outputting text. The "L" after D/I/W/E means they are "locked" when writting file. If thread safe is a concern, use this group macro.
+
+DF/IF/WF/EF has nothing to do with the log file set by SET_LOG_FILE(). The "F" after D/I/W/F stand for "file". That is they write text to the file passed as parameter.
+
+```sample
 /* not thread safe */
-DF(file) << "debug";
-IF(file) << "info";
-WF(file) << "warn";
-EF(file) << "error";
+
+DF(hello.txt) << "World";
+DF(debug.txt) << "I found you, bug";
+EF(error.log) << ex.what();
+...
+
+The file to the parameter can be any valid one, not necessarily be the same file.
 ```
 
-The usage and outputting is the same as DL/IL/WL/EL macros except that SET_LOG_FILE() has no effect on these macros. The file path set by SET_LOG_FILE() just be applied to DL/IL/WL/EL macros.
+For the above two groups, the log file path can be relative or absolute one. But the folder should exist. If any folder in the specified file path does ont exist, it will not be created, thus, logs cannot be written, and no exception will be thrown.
 
-Also, if no file specified, or the path is not correct, no execption occurres.
+DE/IE/WE/EE group allows you write logs to std::cerr.
 
-DF/IF/WF/EF are not thread safe. You may implement it if that is desired. The reason non-thread-safe version is designed, is that it's a bit faster than the thread-safe one. And also the provide flexibility when multiple logs are expected in one application or library.
-
-There has a trick to use the DF/IF/WF/EF ones.
-
-```c++11
-#define DFM DF("my.log")
-... and so on
-
-DFM << "buf information";
+```sample code
+IE << "output to standard error.";
 ```
 
-And, there has a third set of macros, DE/IE/WE/EE allow you write logs to std::cerr.
+### Max lines in one log file
 
-## Max lines in one log file
+```SET_LOG_MAX_SIZE(line_number);``` can specify the max lines in one log file. If the max number has reached, the first line will be removed and the new one be appended to the end of the file. Set to [0] or just not call this function means no max limit. It may cause problem when file goes big. Take care.
 
-`SET_LOG_MAX_SIZE(line_number);` can specify the max lines in one log file. If the max number has reached, the first line will be removed and the new one be appended to the end of the file. 0 or not specified means not max limit. Take care.
+The max line limit apply to DL/IL/WL/EL and DF/IF/WF/EF groups only. It has no effect on DE/IE/WE/EE macros.
 
-## Log levels
+### Log levels
 
-Four log levels defined.
+There have four levels defined.
 
 ```c++11
 #define _LOG_DEBUG 1
@@ -81,26 +96,35 @@ Four log levels defined.
 #define _LOG_ERROR 4
 ```
 
-To contorl which (and above) level's log could be output, define `LOG_LEVEL` micro during compilation or in header file. Only those logs whose level is equal to or greater than `LOG_LEVEL`, will be written to file. The lower level logs are overlooked.
+To contorl which (and above) level's log could be output, define `LOG_LEVEL` micro during compilation or in header file. Only those logs whose level is equal to or greater than `LOG_LEVEL`, will be written to file. The lower level logs are overlooked. (In fact, they will be optimized or removed by the compiler during compilation.)
 
 For instance, when set `LOG_LEVEL` to "\_LOG_INFO", the DL/DE/DF macros will be quiet. Set `LOG_LEVEL` to "\_LOG_WARN", DEBUG and INFO logs shut up.
 
-If no `LOG_LEVEL` is defined, default value will be taken into effect. When `DEBUG` or `_DEBUG` macro is defined, the default log level is "\_LOG_DEBUG", otherwise, it's "\_LOG_INFO".
+If no `LOG_LEVEL` is defined, the default value will be taken into effect. When `DEBUG` or `_DEBUG` macro is defined, the default log level is "\_LOG_DEBUG", otherwise, it's "\_LOG_INFO".
 
 ---
 
-# wstring support on windows
+### wild char support on windows
 
-By adding '''#define \_WLOGGER''' or define \_WLOGGER on compile command line, std::wstring can be used with the logger.
+By defining '''_WLOGGER''' macro, wild char (std::wstring) is used with the loggers.
 
-However, this is just for using on Windows. On linux, doing like this may cause build error at std::wofstream.open().
-And I don't think use wstring on linux is a good idea, so just left it unfixed.
+However, this is just for using on Windows. On linux, doing so may cause compilation error at std::wofstream.open().
+
+I don't think use wild char on linux is a good idea, so just left it un-fixed.
 
 Just do not use \_WLOGGER on linux.
 
 ---
 
-# clog.h
+## stopwatch.hpp
+
+And a simple stopwatch utility also included in this toolkit. It's simple and just have a look at the stopwatch.hpp.
+
+---
+
+## clog.h
+
+A simple logging utility for using with c or c++ before 11.
 
 _***Usage:***_
 
@@ -113,7 +137,6 @@ LOGE("%s", "I am error.");
 
 They somehow look like fprintf. The pros over fprintf are:
 
-- A carriage return will be added automatically.
 - Print formatted information before your message.
 - Log level contorl.
 
@@ -121,4 +144,4 @@ And all the messages are written to std::cerr. If outputting to file is desired,
 
 ---
 
-Any bug reporting and suggestion is welcome. Thanks in advance.
+Have fun, and any bug reporting / suggestion is welcome. Thanks in advance.

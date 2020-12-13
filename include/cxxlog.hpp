@@ -27,33 +27,32 @@
 
 #pragma endregion
 
+#pragma region : Defines for using against wstring or string request.
+
 /**
   * _WLOGGER macro is for using with std::wstring / std::wofstream on windows.
-  * Do not define this macro on linux, otherwise compile error may occur.
+  * Do not define this macro on linux, otherwise compilation error may occur.
   * I do not think to use wchar on linux is a good idea, so left this issue unfixed.
   * */
 #if defined(_WLOGGER)
+#define __t(str) L##str
 #define __t_char wchar_t
 #define __t_string std::wstring
 #define __t_ifstream std::wifstream
 #define __t_ofstream std::wofstream
 #define __t_stringstream std::wstringstream
-#define __t(str) L##str
 #else
+#define __t(str) str
 #define __t_char char
 #define __t_string std::string
 #define __t_ifstream std::ifstream
 #define __t_ofstream std::ofstream
 #define __t_stringstream std::stringstream
-#define __t(str) str
 #endif
 
-#define __sd __t("[DEBUG]")
-#define __si __t("[INFO ]")
-#define __sw __t("[WARN ]")
-#define __se __t("[ERROR]")
+#pragma endregion
 
-#pragma region : log leve defines.set LOG_LEVEL macro during compilation or before use log macros, if needed.
+#pragma region : Log level defines.Define LOG_LEVEL to _LOG_xxx value, if needed.
 
 #define _LOG_ALL 0
 #define _LOG_DEBUG 1
@@ -72,7 +71,7 @@
 
 #pragma endregion
 
-#pragma region : do not use macros define in the region.
+#pragma region : Macros definitions.Do not use them.
 
 #if defined(_MSC_VER)
 #define __PATH_SEP_STR__ "\\"
@@ -85,40 +84,39 @@
 #define __FILENAME__ strrchr(__PATH_SEP_STR__ __FILE__, __PATH_SEP_CHR__) + 1
 #define __CODE_INFO__ __t("[") << __FILENAME__ << __t("(") << __LINE__ << __t(")") << __t("::") << __func__ << __t("]")
 
-#define _V(lg, lv, lvstr) \
-    if (LOG_LEVEL > lv)   \
-    {                     \
-    }                     \
-    else                  \
-        lg << lvstr << __t(" ")
-#define _VC(lg, lv, lvstr) \
-    if (LOG_LEVEL > lv)    \
-    {                      \
-    }                      \
-    else                   \
-        lg << lvstr << __CODE_INFO__ << __t(" ")
+#define __V(lg, lv, leading) \
+    if (LOG_LEVEL > lv)      \
+    {                        \
+    }                        \
+    else                     \
+        lg << leading << __t(" ")
+
+#define __sd __t("[DEBUG]")
+#define __si __t("[INFO ]")
+#define __sw __t("[WARN ]")
+#define __se __t("[ERROR]")
 
 #pragma endregion
 
-#pragma region : macros outputting logs.USE THE MACROS DEFINED IN THIS REGION ONLY.
+#pragma region : Logging macros.USE MACROS DEFINED IN THIS REGION ONLY.
 
 #define SET_LOG_FILE(f) th_util::logger::set_g_log_file(f)
 #define SET_LOG_MAX_SIZE(lz) th_util::logger::get_log_max_size(lz)
 
-#define DL _VC((*th_util::logger::get_g_logger()), _LOG_DEBUG, __sd)
-#define IL _V((*th_util::logger::get_g_logger()), _LOG_INFO, __si)
-#define WL _V((*th_util::logger::get_g_logger()), _LOG_WARN, __sw)
-#define EL _VC((*th_util::logger::get_g_logger()), _LOG_ERROR, __se)
+#define DL __V((*th_util::logger::get_g_logger()), _LOG_DEBUG, __sd << __CODE_INFO__)
+#define IL __V((*th_util::logger::get_g_logger()), _LOG_INFO, __si)
+#define WL __V((*th_util::logger::get_g_logger()), _LOG_WARN, __sw)
+#define EL __V((*th_util::logger::get_g_logger()), _LOG_ERROR, __se << __CODE_INFO__)
 
-#define DF(f) _VC((th_util::logger(f)), _LOG_DEBUG, __sd)
-#define IF(f) _V((th_util::logger(f)), _LOG_INFO, __si)
-#define WF(f) _V((th_util::logger(f)), _LOG_WARN, __sw)
-#define EF(f) _VC((th_util::logger(f)), _LOG_ERROR, __se)
+#define DF(f) __V((th_util::logger(f)), _LOG_DEBUG, __sd << __CODE_INFO__)
+#define IF(f) __V((th_util::logger(f)), _LOG_INFO, __si)
+#define WF(f) __V((th_util::logger(f)), _LOG_WARN, __sw)
+#define EF(f) __V((th_util::logger(f)), _LOG_ERROR, __se << __CODE_INFO__)
 
-#define DE _VC((th_util::ender(std::cerr), std::cerr << th_util::util::get_cur_datetime()), _LOG_DEBUG, __sd)
-#define IE _V((th_util::ender(std::cerr), std::cerr << th_util::util::get_cur_datetime()), _LOG_INFO, __si)
-#define WE _V((th_util::ender(std::cerr), std::cerr << th_util::util::get_cur_datetime()), _LOG_WARN, __sw)
-#define EE _VC((th_util::ender(std::cerr), std::cerr << th_util::util::get_cur_datetime()), _LOG_ERROR, __se)
+#define DE __V((th_util::ender(std::cerr), std::cerr << th_util::util::get_cur_datetime()), _LOG_DEBUG, __sd << __CODE_INFO__)
+#define IE __V((th_util::ender(std::cerr), std::cerr << th_util::util::get_cur_datetime()), _LOG_INFO, __si)
+#define WE __V((th_util::ender(std::cerr), std::cerr << th_util::util::get_cur_datetime()), _LOG_WARN, __sw)
+#define EE __V((th_util::ender(std::cerr), std::cerr << th_util::util::get_cur_datetime()), _LOG_ERROR, __se << __CODE_INFO__)
 
 #pragma endregion
 
@@ -147,6 +145,7 @@ namespace th_util
     class logger
     {
     public:
+#pragma region : static methods
         static void set_g_log_file(const __t_string &file)
         {
             if (file.empty())
@@ -165,8 +164,7 @@ namespace th_util
             return _g_log_file_size;
         }
 
-        static std::shared_ptr<logger>
-        get_g_logger(const __t_string *file = nullptr)
+        static std::shared_ptr<logger> get_g_logger(const __t_string *file = nullptr)
         {
             static __t_string _g_log_file;
             static std::shared_ptr<std::mutex> _g_log_locker;
@@ -183,19 +181,18 @@ namespace th_util
             return lg;
         }
 
+#pragma endregion
+
         logger(const __t_string &logfile, const std::shared_ptr<std::mutex> &locker = nullptr)
             : log_file{logfile}, log_lock{locker}
         {
             std::locale::global(std::locale(""));
-            // TODO ? check if folder exist. If not, empty string to log file path .
         }
 
         template <typename T>
         logger &operator<<(const T &s)
         {
-            if (ss.bad())
-                return *this;
-            if (ss.fail())
+            if (ss.bad() || ss.fail())
             {
                 ss.clear();
                 return *this;
@@ -258,7 +255,7 @@ namespace th_util
         }
 
     private:
-        logger() = default;
+        logger() = delete;
         logger(const logger &) = delete;
         logger(const logger &&) = delete;
         logger &operator=(const logger &) = delete;
