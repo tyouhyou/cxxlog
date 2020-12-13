@@ -186,7 +186,6 @@ namespace th_util
         logger(const __t_string &logfile, const std::shared_ptr<std::mutex> &locker = nullptr)
             : log_file{logfile}, log_lock{locker}
         {
-            std::locale::global(std::locale(""));
         }
 
         template <typename T>
@@ -209,6 +208,8 @@ namespace th_util
 
             if (log_lock)
                 log_lock->lock();
+
+            //auto curloc = std::locale::global(std::locale(""));   // when encountering "lcoale" problem, uncomment it and the line after catch block
             try
             {
                 auto max_size = get_log_max_size();
@@ -250,6 +251,8 @@ namespace th_util
             {
                 // DO NOTHING
             }
+            //std::locale::global(curloc);
+
             if (log_lock)
                 log_lock->unlock();
         }
