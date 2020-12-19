@@ -235,12 +235,12 @@ namespace th_util
                 ofs.imbue(std::locale());
                 if (replaceln > 0)
                 {
-                    ofs.open(log_file, std::ofstream::out | std::ofstream::trunc | std::ios::binary);
+                    ofs.open(log_file, std::ofstream::out | std::ofstream::trunc);
                     ofs << iss.rdbuf();
                 }
                 else
                 {
-                    ofs.open(log_file, std::ofstream::out | std::ofstream::app | std::ios::binary);
+                    ofs.open(log_file, std::ofstream::out | std::ofstream::app);
                 }
                 ofs << util::get_cur_datetime()
                     << ss.str()
