@@ -18,49 +18,49 @@
 
 namespace zb
 {
-	class strcvt
-	{
-	public:
-		/*
+    class strcvt
+    {
+    public:
+        /*
 		* return an empty std::string if convertion failed.
 		*/
-		static std::string wstr_to_str_w_locale(const std::wstring str, const std::string& sloc = "")
-		{
-			std::locale loc(sloc);
-			auto& facet = std::use_facet<std::codecvt<wchar_t, char, std::mbstate_t>>(loc);
-			std::string out(str.size() * facet.max_length(), '\0');
-			const wchar_t* f_next;
-			char* t_next;
-			std::mbstate_t mb{};
-			auto rst = facet.out(mb, &str[0], &str[str.size()], f_next,
-				&out[0], &out[out.size()], t_next);
-			if (std::codecvt_base::ok != rst)
-			{
-				return std::string();
-			}
-			out.resize(t_next - &out[0]);
-			return out;
-		}
+        static std::string wstr_to_str_w_locale(const std::wstring str, const std::string &sloc = "")
+        {
+            std::locale loc(sloc);
+            auto &facet = std::use_facet<std::codecvt<wchar_t, char, std::mbstate_t>>(loc);
+            std::string out(str.size() * facet.max_length(), '\0');
+            const wchar_t *f_next;
+            char *t_next;
+            std::mbstate_t mb{};
+            auto rst = facet.out(mb, &str[0], &str[str.size()], f_next,
+                                 &out[0], &out[out.size()], t_next);
+            if (std::codecvt_base::ok != rst)
+            {
+                return std::string();
+            }
+            out.resize(t_next - &out[0]);
+            return out;
+        }
 
-		/*
+        /*
 		* return an empty std::wstring if convertion failed.
 		*/
-		static std::wstring str_to_wstr_w_locale(const std::string str, const std::string& sloc = "")
-		{
-			std::locale loc(sloc);
-			auto& facet = std::use_facet<std::codecvt<wchar_t, char, std::mbstate_t>>(loc);
-			std::wstring out(str.size() * facet.max_length(), '\0');
-			const char* f_next;
-			wchar_t* t_next;
-			std::mbstate_t mb{};
-			auto rst = facet.in(mb, &str[0], &str[str.size()], f_next,
-				&out[0], &out[out.size()], t_next);
-			if (std::codecvt_base::ok != rst)
-			{
-				return std::wstring();
-			}
-			out.resize(t_next - &out[0]);
-			return out;
-		}
-	};
-}
+        static std::wstring str_to_wstr_w_locale(const std::string str, const std::string &sloc = "")
+        {
+            std::locale loc(sloc);
+            auto &facet = std::use_facet<std::codecvt<wchar_t, char, std::mbstate_t>>(loc);
+            std::wstring out(str.size() * facet.max_length(), '\0');
+            const char *f_next;
+            wchar_t *t_next;
+            std::mbstate_t mb{};
+            auto rst = facet.in(mb, &str[0], &str[str.size()], f_next,
+                                &out[0], &out[out.size()], t_next);
+            if (std::codecvt_base::ok != rst)
+            {
+                return std::wstring();
+            }
+            out.resize(t_next - &out[0]);
+            return out;
+        }
+    };
+} // namespace zb

@@ -23,18 +23,18 @@ void test_wlogger()
     StopWatch sw;
     sw.start();
 
-    SET_LOG_FILE(S2WL("test/¥í¥°.txt"));
+    SET_LOG_FILE(S2WL("test/ãƒ­ã‚°.txt"));
     SET_LOG_MAX_SIZE(0);
 
-    DL << L"¥Ð¥°";
+    DL << L"ãƒã‚°";
     IL << L"Info";
-    WL << L"¾¯¸æ";
-    EL << L"¥¨¥é©`";
+    WL << L"è­¦å‘Š";
+    EL << L"ã‚¨ãƒ©ãƒ¼";
 
-    DF(S2WL("test/log.txt")) << L"¥Ð¥°";
+    DF(S2WL("test/log.txt")) << L"ãƒã‚°";
     IF(L"test/log.txt") << L"Info";
-    WF(L"test/log.txt") << L"¾¯¸æ";
-    EF(L"test/log.txt") << L"¥¨¥é©`";
+    WF(L"test/log.txt") << L"è­¦å‘Š";
+    EF(L"test/log.txt") << L"ã‚¨ãƒ©ãƒ¼";
 
     std::cerr << "elapsed: " << sw.elaspsed() << " microseconds.";
 #endif
@@ -47,17 +47,17 @@ void test_logger()
     StopWatch sw;
     sw.start();
 
-    SET_LOG_FILE(W2SL(L"test/¥í¥°.txt"));
+    SET_LOG_FILE(W2SL(L"test/ãƒ­ã‚°.txt"));
     SET_LOG_MAX_SIZE(20);
 
     DL << "Here you are, BUG.";
     IL << "Let me inform you.";
     WL << "Alert, paradise is falling";
     EL << "OMG, it crashed.";
-    DL << "¥Ð¥°";
+    DL << "ãƒã‚°";
     IL << "Info";
-    WL << "¾¯¸æ";
-    EL << "¥¨¥é©`";
+    WL << "è­¦å‘Š";
+    EL << "ã‚¨ãƒ©ãƒ¼";
 
     IE << "The first group elasped: " << sw.wrap() << " microseconds";
 
@@ -68,10 +68,10 @@ void test_logger()
 
     IE << "The second group elasped: " << sw.wrap() << " microseconds";
 
-    DF("test/log.txt") << "¥Ð¥°";
+    DF("test/log.txt") << "ãƒã‚°";
     IF("test/log.txt") << "Info";
-    WF("test/log.txt") << "¾¯¸æ";
-    EF("test/log.txt") << "¥¨¥é©`";
+    WF("test/log.txt") << "è­¦å‘Š";
+    EF("test/log.txt") << "ã‚¨ãƒ©ãƒ¼";
 
     IE << "The third group elasped: " << sw.wrap() << " microseconds";
 
