@@ -1,5 +1,8 @@
 /* *
+* Stopwatch for performance measuring purpose.
+* 
  * @author  tyouhyou    github.com/tyouhyou
+ * @license MIT
  * */
 
 #pragma once
@@ -7,7 +10,7 @@
 #include <chrono>
 #include <functional>
 
-namespace th_util
+namespace zb
 {
 
     class StopWatch

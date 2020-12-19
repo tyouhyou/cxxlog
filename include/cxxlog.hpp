@@ -2,6 +2,7 @@
  * A simple log utility for c++ projects (c++11 and later).
  *
  * @author  tyouhyou    github.com/tyouhyou
+ * @license MIT
  * */
 
 #pragma once
@@ -100,29 +101,29 @@
 
 #pragma region : Logging macros.USE MACROS DEFINED IN THIS REGION ONLY.
 
-#define SET_LOG_FILE(f) th_util::logger::set_g_log_file(f)
-#define SET_LOG_MAX_SIZE(lz) th_util::logger::get_log_max_size(lz)
+#define SET_LOG_FILE(f) zb::logger::set_g_log_file(f)
+#define SET_LOG_MAX_SIZE(lz) zb::logger::get_log_max_size(lz)
 
-#define DL __V((*th_util::logger::get_g_logger()), _LOG_DEBUG, __sd << __CODE_INFO__)
-#define IL __V((*th_util::logger::get_g_logger()), _LOG_INFO, __si)
-#define WL __V((*th_util::logger::get_g_logger()), _LOG_WARN, __sw)
-#define EL __V((*th_util::logger::get_g_logger()), _LOG_ERROR, __se << __CODE_INFO__)
+#define DL __V((*zb::logger::get_g_logger()), _LOG_DEBUG, __sd << __CODE_INFO__)
+#define IL __V((*zb::logger::get_g_logger()), _LOG_INFO, __si)
+#define WL __V((*zb::logger::get_g_logger()), _LOG_WARN, __sw)
+#define EL __V((*zb::logger::get_g_logger()), _LOG_ERROR, __se << __CODE_INFO__)
 
-#define DF(f) __V((th_util::logger(f)), _LOG_DEBUG, __sd << __CODE_INFO__)
-#define IF(f) __V((th_util::logger(f)), _LOG_INFO, __si)
-#define WF(f) __V((th_util::logger(f)), _LOG_WARN, __sw)
-#define EF(f) __V((th_util::logger(f)), _LOG_ERROR, __se << __CODE_INFO__)
+#define DF(f) __V((zb::logger(f)), _LOG_DEBUG, __sd << __CODE_INFO__)
+#define IF(f) __V((zb::logger(f)), _LOG_INFO, __si)
+#define WF(f) __V((zb::logger(f)), _LOG_WARN, __sw)
+#define EF(f) __V((zb::logger(f)), _LOG_ERROR, __se << __CODE_INFO__)
 
-#define DE __V((th_util::ender(std::cerr), std::cerr << th_util::util::get_cur_datetime()), _LOG_DEBUG, __sd << __CODE_INFO__)
-#define IE __V((th_util::ender(std::cerr), std::cerr << th_util::util::get_cur_datetime()), _LOG_INFO, __si)
-#define WE __V((th_util::ender(std::cerr), std::cerr << th_util::util::get_cur_datetime()), _LOG_WARN, __sw)
-#define EE __V((th_util::ender(std::cerr), std::cerr << th_util::util::get_cur_datetime()), _LOG_ERROR, __se << __CODE_INFO__)
+#define DE __V((zb::ender(std::cerr), std::cerr << zb::util::get_cur_datetime()), _LOG_DEBUG, __sd << __CODE_INFO__)
+#define IE __V((zb::ender(std::cerr), std::cerr << zb::util::get_cur_datetime()), _LOG_INFO, __si)
+#define WE __V((zb::ender(std::cerr), std::cerr << zb::util::get_cur_datetime()), _LOG_WARN, __sw)
+#define EE __V((zb::ender(std::cerr), std::cerr << zb::util::get_cur_datetime()), _LOG_ERROR, __se << __CODE_INFO__)
 
 #pragma endregion
 
 #pragma region : Definitions of classes backing the log output macros.Do not use them directly.
 
-namespace th_util
+namespace zb
 {
     class util
     {
@@ -209,7 +210,9 @@ namespace th_util
             if (log_lock)
                 log_lock->lock();
 
-            //auto curloc = std::locale::global(std::locale(""));   // when encountering "lcoale" problem, uncomment it and the line after catch block
+#if defined(_WLOGGER)
+            auto curloc = std::locale::global(std::locale(""));
+#endif
             try
             {
                 auto max_size = get_log_max_size();
@@ -251,7 +254,9 @@ namespace th_util
             {
                 // DO NOTHING
             }
-            //std::locale::global(curloc);
+#if defined(_WLOGGER)
+            std::locale::global(curloc);
+#endif
 
             if (log_lock)
                 log_lock->unlock();
@@ -285,7 +290,7 @@ namespace th_util
         std::shared_ptr<std::ostream> os;
     };
 
-} // namespace th_util
+} // namespace zb
 
 #pragma endregion
 

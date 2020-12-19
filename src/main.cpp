@@ -1,9 +1,12 @@
-// #define _WLOGGER // just for test on windows
+//#define _WLOGGER // just for test on windows
 
+#include <locale>
+#include <codecvt>
 #include "cxxlog.hpp"
 #include "stopwatch.hpp"
+#include "strcvt.hpp"
 
-using namespace th_util;
+using namespace zb;
 
 void test_logger();
 void test_wlogger();
@@ -17,21 +20,21 @@ int main()
 void test_wlogger()
 {
 #ifdef _WLOGGER
-    th_util::StopWatch sw;
+    StopWatch sw;
     sw.start();
 
-    SET_LOG_FILE(L"test/ãƒ­ã‚°.txt");
+    SET_LOG_FILE(S2WL("test/¥í¥°.txt"));
     SET_LOG_MAX_SIZE(0);
 
-    DL << L"ãƒã‚°";
+    DL << L"¥Ð¥°";
     IL << L"Info";
-    WL << L"è­¦å‘Š";
-    EL << L"ã‚¨ãƒ©ãƒ¼";
+    WL << L"¾¯¸æ";
+    EL << L"¥¨¥é©`";
 
-    DF(L"test/log.txt") << L"ãƒã‚°";
+    DF(S2WL("test/log.txt")) << L"¥Ð¥°";
     IF(L"test/log.txt") << L"Info";
-    WF(L"test/log.txt") << L"è­¦å‘Š";
-    EF(L"test/log.txt") << L"ã‚¨ãƒ©ãƒ¼";
+    WF(L"test/log.txt") << L"¾¯¸æ";
+    EF(L"test/log.txt") << L"¥¨¥é©`";
 
     std::cerr << "elapsed: " << sw.elaspsed() << " microseconds.";
 #endif
@@ -41,34 +44,34 @@ void test_logger()
 {
 #ifndef _WLOGGER
 
-    th_util::StopWatch sw;
+    StopWatch sw;
     sw.start();
 
-    SET_LOG_FILE("test/ãƒ­ã‚°.txt");
+    SET_LOG_FILE(W2SL(L"test/¥í¥°.txt"));
     SET_LOG_MAX_SIZE(20);
 
     DL << "Here you are, BUG.";
     IL << "Let me inform you.";
     WL << "Alert, paradise is falling";
     EL << "OMG, it crashed.";
-    DL << "ãƒã‚°";
+    DL << "¥Ð¥°";
     IL << "Info";
-    WL << "è­¦å‘Š";
-    EL << "ã‚¨ãƒ©ãƒ¼";
+    WL << "¾¯¸æ";
+    EL << "¥¨¥é©`";
 
     IE << "The first group elasped: " << sw.wrap() << " microseconds";
 
-    DF("test/debug.log") << "This is debug message.";
+    DF(W2SL(L"test/debug.log")) << "This is debug message.";
     IF("test/info.log") << "Information for you.";
     WF("test/warn.log") << "I warn you.";
     EF("test/error.log") << "An error message goes here.";
 
     IE << "The second group elasped: " << sw.wrap() << " microseconds";
 
-    DF("test/log.txt") << "ãƒã‚°";
+    DF("test/log.txt") << "¥Ð¥°";
     IF("test/log.txt") << "Info";
-    WF("test/log.txt") << "è­¦å‘Š";
-    EF("test/log.txt") << "ã‚¨ãƒ©ãƒ¼";
+    WF("test/log.txt") << "¾¯¸æ";
+    EF("test/log.txt") << "¥¨¥é©`";
 
     IE << "The third group elasped: " << sw.wrap() << " microseconds";
 
