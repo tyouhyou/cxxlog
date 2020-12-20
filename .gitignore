@@ -2,8 +2,6 @@
 bin/
 lib/
 test/
-.vscode/
-.replit
 
 # Prerequisites
 *.d
