@@ -90,7 +90,7 @@
     {                        \
     }                        \
     else                     \
-        lg << leading << __t(" ")
+        lg << std::boolalpha << leading << __t(" ")
 
 #define __sd __t("[DEBUG]")
 #define __si __t("[INFO ]")
@@ -247,6 +247,7 @@ namespace zb
                 }
                 ofs << util::get_cur_datetime()
                     << ss.str()
+                    << std::noboolalpha
                     << std::endl;
                 ofs.close();
             }
@@ -283,7 +284,7 @@ namespace zb
         }
         ~ender()
         {
-            *os << std::endl;
+            *os << std::noboolalpha << std::endl;
         }
 
     private:
