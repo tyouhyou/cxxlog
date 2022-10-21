@@ -45,10 +45,12 @@ void test_logger()
 #ifndef _WLOGGER
 
     StopWatch sw;
-    sw.start();
 
     SET_LOG_FILE(W2SL(L"test/ログ.txt"));
     SET_LOG_MAX_SIZE(20);
+
+    sw.start();
+    sw.mark("start");
 
     DL << "Here you are, BUG.";
     IL << "Let me inform you.";
@@ -60,6 +62,8 @@ void test_logger()
     EL << "エラー";
 
     IE << "The first group elasped: " << sw.wrap() << " microseconds";
+    sw.mark("first group end");
+    IE << "start -> 1: " << sw.measure("start", "first group end");
 
     DF(W2SL(L"test/debug.log")) << "This is debug message.";
     IF("test/info.log") << "Information for you.";
@@ -67,6 +71,8 @@ void test_logger()
     EF("test/error.log") << "An error message goes here.";
 
     IE << "The second group elasped: " << sw.wrap() << " microseconds";
+    sw.mark("second group end");
+    IE << "1 -> 2: " << sw.measure("first group end", "second group end");
 
     DF("test/log.txt") << "バグ";
     IF("test/log.txt") << "Info";
@@ -74,7 +80,10 @@ void test_logger()
     EF("test/log.txt") << "エラー";
 
     IE << "The third group elasped: " << sw.wrap() << " microseconds";
+    sw.mark("third group end");
+    IE << "2 -> 3: " << sw.measure("second group end", "third group end");
 
+    IE << "start -> Third group: " << sw.measure("start", "third group end");
     IE << "Totally: " << sw.elaspsed() << " microseconds.";
 
 #endif
