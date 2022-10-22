@@ -6,8 +6,9 @@
  * Use redirection to put messages to file if stderr is not desired.
  *
  * If used with c++11 (and later) project, cxxlog.hpp is recommended.
- * 
+ *
  * @author  tyouhyou    github.com/tyouhyou
+ * @Licence GPL
  * */
 
 #ifndef TH_CLOG_H

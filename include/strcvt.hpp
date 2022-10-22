@@ -1,8 +1,8 @@
 /* *
-* string converter
-* 
+ * string converter
+ *
  * @author  tyouhyou    github.com/tyouhyou
- * @license MIT
+ * @license GPL
  * */
 
 #pragma once
@@ -22,8 +22,8 @@ namespace zb
     {
     public:
         /*
-		* return an empty std::string if convertion failed.
-		*/
+         * return an empty std::string if convertion failed.
+         */
         static std::string wstr_to_str_w_locale(const std::wstring str, const std::string &sloc = "")
         {
             std::locale loc(sloc);
@@ -43,8 +43,8 @@ namespace zb
         }
 
         /*
-		* return an empty std::wstring if convertion failed.
-		*/
+         * return an empty std::wstring if convertion failed.
+         */
         static std::wstring str_to_wstr_w_locale(const std::string str, const std::string &sloc = "")
         {
             std::locale loc(sloc);

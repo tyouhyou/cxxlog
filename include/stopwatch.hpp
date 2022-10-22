@@ -2,7 +2,7 @@
  * Stopwatch for performance measuring purpose.
  *
  * @author  tyouhyou    github.com/tyouhyou
- * @license MIT
+ * @license GPL
  * */
 
 #pragma once

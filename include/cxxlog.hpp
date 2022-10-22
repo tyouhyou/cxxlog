@@ -2,7 +2,7 @@
  * A simple log utility for c++ projects (c++11 and later).
  *
  * @author  tyouhyou    github.com/tyouhyou
- * @license MIT
+ * @license GPL
  * */
 
 #pragma once
@@ -31,10 +31,10 @@
 #pragma region : Defines for using against wstring or string request.
 
 /**
-  * _WLOGGER macro is for using with std::wstring / std::wofstream on windows.
-  * Do not define this macro on linux, otherwise compilation error may occur.
-  * I do not think to use wchar on linux is a good idea, so left this issue unfixed.
-  * */
+ * _WLOGGER macro is for using with std::wstring / std::wofstream on windows.
+ * Do not define this macro on linux, otherwise compilation error may occur.
+ * I do not think to use wchar on linux is a good idea, so left this issue unfixed.
+ * */
 #if defined(_WLOGGER)
 #define __t(str) L##str
 #define __t_char wchar_t
