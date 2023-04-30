@@ -1,10 +1,12 @@
-//#define _WLOGGER // just for test on windows
+// #define _WLOGGER // just for test on windows
 
-#include <locale>
+#include "../include/cxxlog.hpp"
+#include "../include/decorator.hpp"
+#include "../include/stopwatch.hpp"
+#include "../include/strcvt.hpp"
 #include <codecvt>
-#include "cxxlog.hpp"
-#include "stopwatch.hpp"
-#include "strcvt.hpp"
+#include <locale>
+#include <thread>
 
 using namespace zb;
 
@@ -49,6 +51,9 @@ void test_logger()
     SET_LOG_FILE(W2SL(L"test/ログ.txt"));
     SET_LOG_MAX_SIZE(20);
 
+    DE << "Sleep a second before start.";
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
     sw.start();
     sw.mark("start");
 
@@ -86,5 +91,15 @@ void test_logger()
     IE << "start -> Third group: " << sw.measure("start", "third group end");
     IE << "Totally: " << sw.elaspsed() << " microseconds.";
 
+    auto callable = deco_beforeafter(
+        [](int a, int b) -> int
+        { return a + b; },
+        [&]()
+        { DE << "start"; },
+        [&]()
+        { DE << "end"; });
+
+    auto ret = callable(1, 2);
+    DE << ret;
 #endif
 }

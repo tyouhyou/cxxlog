@@ -9,6 +9,8 @@
 
 #include <chrono>
 #include <functional>
+#include <memory>
+#include <mutex>
 #include <unordered_map>
 
 namespace zb
@@ -17,6 +19,18 @@ namespace zb
     class StopWatch
     {
     public:
+        static std::shared_ptr<StopWatch> g_sw()
+        {
+            static std::shared_ptr<StopWatch> sw;
+            static std::mutex mtx;
+            std::lock_guard<std::mutex> lock(mtx);
+            if (!sw)
+            {
+                sw = std::make_shared<StopWatch>();
+            }
+            return sw;
+        }
+
         StopWatch &start()
         {
             mark_list.clear();

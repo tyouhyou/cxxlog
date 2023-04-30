@@ -1,5 +1,5 @@
 CC		:= g++
-CFLAGS	:= -std=c++11 -Wall -Wextra -Wno-unknown-pragmas
+CFLAGS	:= -std=c++17 -Wall -Wextra -Wno-unknown-pragmas
 
 BIN		:= bin
 SRC		:= src
