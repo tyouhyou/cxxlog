@@ -35,6 +35,41 @@
                     "message": 5
                 }
             }
+        },
+        {
+            "label": "build win32 debug",
+            "command": "cl.exe",
+            "args": [
+                "src/*.cpp",
+                "/I${workspaceRoot}\\include",
+                "/D _DEBUG /D _LOG_LOCK",
+                "/Zi",
+                "/Od",
+                "/EHsc",
+                "/OUT ${workspaceRoot}\\bin\\main.exe",
+            ],
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "panel": "shared"
+            },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceRoot}"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
         }
     ]
 }

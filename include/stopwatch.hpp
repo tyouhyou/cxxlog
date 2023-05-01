@@ -57,6 +57,13 @@ namespace zb
             mark_list[m] = std::chrono::high_resolution_clock::now();
         }
 
+        long long measure(std::string mark)
+        {
+            auto temppoint = std::chrono::high_resolution_clock::now();
+            auto dur = std::chrono::duration_cast<std::chrono::microseconds>(temppoint - mark_list[mark]);
+            return dur.count();
+        }
+
         long long measure(std::string mark1, std::string mark2)
         {
             auto dur = std::chrono::duration_cast<std::chrono::microseconds>(mark_list[mark2] - mark_list[mark1]);

@@ -1,0 +1,23 @@
+#define macros
+CFLAGS			= /c /std:c++14 /EHsc
+
+DIR_SRC = .\src
+DIR_INC = .\include
+DIR_BIN = .\bin
+OBJECTS = $(DIR_BIN)\main.obj
+EXECUTABLE = $(DIR_BIN)\main.exe
+
+$(DIR_BIN)\main.obj: $(DIR_SRC)\main.cpp
+	cl $(CFLAGS) /Fo:$(DIR_BIN)\main.obj /I$(DIR_INC) -c $(DIR_SRC)\main.cpp
+
+$(EXECUTABLE) : $(OBJECTS)
+	link /MACHINE:x64 /out:$(EXECUTABLE) $(OBJECTS)
+
+clean:
+	del $(DIR_BIN)\*.obj
+	del $(EXECUTABLE)
+
+all: $(EXECUTABLE)
+	
+run:
+	$(EXECUTABLE)

@@ -7,20 +7,11 @@ INCLUDE	:= include
 LIB		:= lib
 
 LIBRARIES	:=
-
-ifeq ($(OS),Windows_NT)
-EXECUTABLE	:= main.exe
-SOURCEDIRS	:= $(SRC)
-OBJDIR   	:= $(BIN)
-INCLUDEDIRS	:= $(INCLUDE)
-LIBDIRS		:= $(LIB)
-else
 EXECUTABLE	:= main
 SOURCEDIRS	:= $(shell find $(SRC) -type d)
 OBJDIR   	:= $(shell find $(BIN) -type d)
 INCLUDEDIRS	:= $(shell find $(INCLUDE) -type d)
 LIBDIRS		:= $(shell find $(LIB) -type d)
-endif
 
 CINCLUDES	:= $(patsubst %,-I%, $(INCLUDEDIRS:%/=%))
 CLIBS		:= $(patsubst %,-L%, $(LIBDIRS:%/=%))

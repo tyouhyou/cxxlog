@@ -8,59 +8,77 @@
 #pragma once
 
 #include <functional>
+#include <type_traits>
 
 namespace zb
 {
-    /*
-     * reference:
-     * https://stackoverflow.com/questions/28498852/c-function-decorator
-     */
-    template <class TR>
-    struct deco
+    template <class TR, class... TARGS>
+    struct deco_func
     {
-        template <class TF, class... TARG>
-        deco(TF &&fun, TARG &&...args)
-            : val(std::forward<TF>(fun)(std::forward<TARG>(args)...))
+        auto wrap(std::function<TR(TARGS...)> fn) -> deco_func<TR, TARGS...>&
         {
+            fun = std::forward<std::function<TR(TARGS...)>>(fn);
+            return *this;
         }
 
-        TR &&value()
+        auto wrap_before(std::function<void()> fn) -> deco_func<TR, TARGS...>&
         {
-            return static_cast<TR &&>(val);
+            fn_b = std::forward<std::function<void()>>(fn);
+            return *this;
+        }
+
+        auto wrap_after(std::function<void()> fn) -> deco_func<TR, TARGS...>&
+        {
+            fn_a = std::forward<std::function<void()>>(fn);
+            return *this;
+        }
+
+        TR &&call(TARGS... args)
+        {
+            if (fn_b) fn_b();
+            auto rst = fun(std::forward<TARGS>(args)...);
+            if (fn_a) fn_a();
+            return std::move(static_cast<TR &&>(rst));
         }
 
     private:
-        TR val;
+        std::function<TR(TARGS...)> fun;
+        std::function<void()> fn_b;
+        std::function<void()> fn_a;
     };
 
-    template <>
-    struct deco<void>
+    template <class... TARGS>
+    struct deco_action
     {
-        template <class TF, class... TARG>
-        deco(TF &&fun, TARG &&...args)
+        auto wrap(std::function<void(TARGS...)> fn) -> deco_action<TARGS...>&
         {
-            std::forward<TF>(fun)(std::forward<TARG>(args)...);
+            fun = std::forward<std::function<void(TARGS...)>>(fn);
+            return *this;
         }
 
-        void value()
+        auto wrap_before(std::function<void()> fn) -> deco_action<TARGS...>&
         {
+            fn_b = std::forward<std::function<void()>>(fn);
+            return *this;
         }
+
+        auto wrap_after(std::function<void()> fn) -> deco_action<TARGS...>&
+        {
+            fn_a = std::forward<std::function<void()>>(fn);
+            return *this;
+        }
+
+        void call(TARGS... args)
+        {
+            if (fn_b) fn_b();
+            fun(std::forward<TARGS>(args)...);
+            if (fn_a) fn_a();
+        }
+
+    private:
+        std::function<void(TARGS...)> fun;
+        std::function<void()> fn_b;
+        std::function<void()> fn_a;
     };
-
-    template <class TF, class TB, class TA>
-    auto deco_beforeafter(TF &&fun, TB &&before, TA &&after)
-    {
-        return
-            [fun = std::forward<TF>(fun),
-             before = std::forward<TB>(before),
-             after = std::forward<TA>(after)](auto &&...args) -> decltype(auto)
-        {
-            before();
-            deco<std::result_of_t<TF(decltype(args)...)>> ret(
-                fun, std::forward<decltype(args)>(args)...);
-            after();
-            return ret.value();
-        };
-    }
 
 } // namespace zb
