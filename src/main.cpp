@@ -126,16 +126,16 @@ void test_logger()
         {
             ret += i;
         }
-        return ret; })
+        return ret; 
+                         })
                    .wrap_before([&sw]() -> void
                                 {
-        IE << "count starts.";
+        IE << "func starts.";
         sw.mark("count"); })
                    .wrap_after([&sw]() -> void
-                               { IE << "count ended. elapsed: " << sw.measure("count") / 1000.0 << " ms."; })
+                               { IE << "func ended. elapsed: " << sw.measure("count") / 1000.0 << " ms."; })
                    .call(1000);
-    ;
-    IE << "count result: " << cal;
+    IE << "count result: " << (*cal);
 
     deco_action<int>()
         .wrap([](int count) -> void
@@ -144,7 +144,9 @@ void test_logger()
         for(int i=0; i<count; i++)
         {
             ret += i;
-        } })
+        } 
+                  IE << "action, loop result: " << ret;
+              })
         .wrap_before([&sw]() -> void
                      {
         IE << "action starts.";
@@ -152,7 +154,6 @@ void test_logger()
         .wrap_after([&sw]() -> void
                     { IE << "action ended. elapsed: " << sw.measure("noreturn") / 1000.0 << " ms."; })
         .call(100000);
-    ;
 
 #endif
 }

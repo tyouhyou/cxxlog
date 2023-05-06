@@ -8,77 +8,65 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 #include <type_traits>
 
 namespace zb
 {
     template <class TR, class... TARGS>
-    struct deco_func
+    class deco
     {
-        auto wrap(std::function<TR(TARGS...)> fn) -> deco_func<TR, TARGS...>&
+    public:
+        auto wrap(std::function<TR(TARGS...)> fn) -> deco<TR, TARGS...>&
         {
             fun = std::forward<std::function<TR(TARGS...)>>(fn);
             return *this;
         }
 
-        auto wrap_before(std::function<void()> fn) -> deco_func<TR, TARGS...>&
+        auto wrap_before(std::function<void()> fn) -> deco<TR, TARGS...>&
         {
             fn_b = std::forward<std::function<void()>>(fn);
             return *this;
         }
 
-        auto wrap_after(std::function<void()> fn) -> deco_func<TR, TARGS...>&
+        auto wrap_after(std::function<void()> fn) -> deco<TR, TARGS...>&
         {
             fn_a = std::forward<std::function<void()>>(fn);
             return *this;
         }
 
-        TR &&call(TARGS... args)
-        {
-            if (fn_b) fn_b();
-            auto rst = fun(std::forward<TARGS>(args)...);
-            if (fn_a) fn_a();
-            return std::move(static_cast<TR &&>(rst));
-        }
+        virtual std::shared_ptr<TR> call(TARGS... args) = 0;
 
-    private:
+    protected:
         std::function<TR(TARGS...)> fun;
         std::function<void()> fn_b;
         std::function<void()> fn_a;
     };
 
-    template <class... TARGS>
-    struct deco_action
+    template <class TR, class... TARGS>
+    class deco_func : public deco<TR, TARGS...> 
     {
-        auto wrap(std::function<void(TARGS...)> fn) -> deco_action<TARGS...>&
+    public:
+        std::shared_ptr<TR> call(TARGS... args) override
         {
-            fun = std::forward<std::function<void(TARGS...)>>(fn);
-            return *this;
+            if (deco<TR, TARGS...>::fn_b) deco<TR, TARGS...>::fn_b();
+            auto rst = deco<TR, TARGS...>::fun(std::forward<TARGS>(args)...);
+            if (deco<TR, TARGS...>::fn_a) deco<TR, TARGS...>::fn_a();
+            return std::make_shared<TR>(rst);
         }
+    };
 
-        auto wrap_before(std::function<void()> fn) -> deco_action<TARGS...>&
+    template <class... TARGS>
+    class deco_action : public deco<void, TARGS...>
+    {
+    public:
+        std::shared_ptr<void> call(TARGS... args) override
         {
-            fn_b = std::forward<std::function<void()>>(fn);
-            return *this;
+            if (deco<void, TARGS...>::fn_b) deco<void, TARGS...>::fn_b();
+            deco<void, TARGS...>::fun(std::forward<TARGS>(args)...);
+            if (deco<void, TARGS...>::fn_a) deco<void, TARGS...>::fn_a();
+            return nullptr;
         }
-
-        auto wrap_after(std::function<void()> fn) -> deco_action<TARGS...>&
-        {
-            fn_a = std::forward<std::function<void()>>(fn);
-            return *this;
-        }
-
-        void call(TARGS... args)
-        {
-            if (fn_b) fn_b();
-            fun(std::forward<TARGS>(args)...);
-            if (fn_a) fn_a();
-        }
-
-    private:
-        std::function<void(TARGS...)> fun;
-        std::function<void()> fn_b;
-        std::function<void()> fn_a;
     };
 
 } // namespace zb
