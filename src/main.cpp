@@ -118,6 +118,8 @@ void test_logger()
     // auto ret = callable(11, 22);
     // IE << "callable returns " << ret;
 
+    bool rst_before = false;
+    bool rst_after = false;
     auto cal = deco_func<int, int>()
                    .wrap([](int count) -> int
                          {
@@ -126,17 +128,23 @@ void test_logger()
         {
             ret += i;
         }
-        return ret; 
-                         })
-                   .wrap_before([&sw]() -> void
+        return ret; })
+                   .wrap_before([&sw](int) -> bool
                                 {
-        IE << "func starts.";
-        sw.mark("count"); })
-                   .wrap_after([&sw]() -> void
-                               { IE << "func ended. elapsed: " << sw.measure("count") / 1000.0 << " ms."; })
-                   .call(1000);
-    IE << "count result: " << (*cal);
+            IE << "func starts.";
+            sw.mark("count");
+            return true; })
+                   .wrap_after([&sw](int) -> bool
+                               { IE << "func ended. elapsed: " << sw.measure("count") / 1000.0 << " ms.";
+                    return true; })
+                   .call(1000)
+                   .result(rst_before, rst_after);
+    IE << "count result: " << cal;
+    IE << "func before result: " << rst_before;
+    IE << "func after result: " << rst_after;
 
+    rst_before = false;
+    rst_after = false;
     deco_action<int>()
         .wrap([](int count) -> void
               {
@@ -145,15 +153,19 @@ void test_logger()
         {
             ret += i;
         } 
-                  IE << "action, loop result: " << ret;
-              })
-        .wrap_before([&sw]() -> void
+                  IE << "action, loop result: " << ret; })
+        .wrap_before([&sw](int) -> bool
                      {
         IE << "action starts.";
-        sw.mark("noreturn"); })
-        .wrap_after([&sw]() -> void
-                    { IE << "action ended. elapsed: " << sw.measure("noreturn") / 1000.0 << " ms."; })
-        .call(100000);
+        sw.mark("noreturn");
+        return true; })
+        .wrap_after([&sw](int) -> bool
+                    { IE << "action ended. elapsed: " << sw.measure("noreturn") / 1000.0 << " ms.";
+                      return true; })
+        .call(100000)
+        .result(rst_before, rst_after);
+    IE << "action before result: " << rst_before;
+    IE << "action after result: " << rst_after;
 
 #endif
 }
