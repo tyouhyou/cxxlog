@@ -89,8 +89,8 @@ namespace zb
     class deco_func : public deco<TR, TARGS...>
     {
     protected:
-        TR _result() { return rst; }
-        std::shared_ptr<TR> _presult() { return std::make_shared<TR>(rst); }
+        TR _result() override { return rst; }
+        std::shared_ptr<TR> _presult() override { return std::make_shared<TR>(rst); }
         void _call(TARGS... args) override
         {
             rst = deco<TR, TARGS...>::fun(std::forward<TARGS>(args)...);
