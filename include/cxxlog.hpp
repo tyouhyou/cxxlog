@@ -167,17 +167,14 @@ namespace zb
 
         static std::shared_ptr<logger> get_g_logger(const __t_string *file = nullptr)
         {
-            static __t_string _g_log_file;
-            static std::shared_ptr<std::mutex> _g_log_locker;
+            static __t_string _g_log_file = "log.txt";
+            static std::shared_ptr<std::mutex> _g_log_locker = std::make_shared<std::mutex>();
 
             if (nullptr != file && !file->empty())
             {
                 _g_log_file = *file;
-                _g_log_locker = std::make_shared<std::mutex>();
-
                 return (std::shared_ptr<logger>)nullptr;
             }
-
             auto lg = std::make_shared<logger>(_g_log_file, _g_log_locker);
             return lg;
         }
