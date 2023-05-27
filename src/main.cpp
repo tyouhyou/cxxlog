@@ -22,7 +22,7 @@ int main()
 void test_wlogger()
 {
 #ifdef _WLOGGER
-    StopWatch sw;
+    stopwatch sw;
     sw.start();
 
     SET_LOG_FILE(S2WL("test/ログ.txt"));
@@ -63,7 +63,7 @@ void test_logger()
 {
 #ifndef _WLOGGER
 
-    StopWatch sw;
+    stopwatch sw;
 
     SET_LOG_FILE(W2SL(L"test/ログ.txt"));
     SET_LOG_MAX_SIZE(20);

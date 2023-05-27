@@ -1,5 +1,5 @@
 /* *
- * Stopwatch for performance measuring purpose.
+ * stopwatch for performance measuring purpose.
  *
  * @author  tyouhyou    github.com/tyouhyou
  * @license GPL
@@ -16,22 +16,22 @@
 namespace zb
 {
 
-    class StopWatch
+    class stopwatch
     {
     public:
-        static std::shared_ptr<StopWatch> g_sw()
+        static std::shared_ptr<stopwatch> g_sw()
         {
-            static std::shared_ptr<StopWatch> sw;
+            static std::shared_ptr<stopwatch> sw;
             static std::mutex mtx;
             std::lock_guard<std::mutex> lock(mtx);
             if (!sw)
             {
-                sw = std::make_shared<StopWatch>();
+                sw = std::make_shared<stopwatch>();
             }
             return sw;
         }
 
-        StopWatch &start()
+        stopwatch &start()
         {
             mark_list.clear();
             startpoint = std::chrono::high_resolution_clock::now();
@@ -70,12 +70,12 @@ namespace zb
             return dur.count();
         }
 
-        StopWatch &reset()
+        stopwatch &reset()
         {
             return start();
         }
 
-        ~StopWatch()
+        ~stopwatch()
         {
             mark_list.clear();
         }

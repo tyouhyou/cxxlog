@@ -3,10 +3,9 @@ __*Refer to [wiki page](https://github.com/tyouhyou/cxx-toolset/wiki) for detail
 In this toolset, we have utilities such as Logger, Stopwatch, Decorator etc.
 
 # _TOC_
-- [_TOC_](#toc)
-- [Logger](#logger)
-- [Stopwatch](#stopwatch)
-- [Decorator](#decorator)
+- [Logger](#Logger)
+- [Stopwatch](#Stopwatch)
+- [Decorator](#Decorator)
 
 # Logger
 Just leave the log text, Logger will take care the rest of matter such as logging time, logging level, file name, line etc. As follows:
