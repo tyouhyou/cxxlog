@@ -25,6 +25,7 @@
 #include <mutex>
 #include <locale>
 #include <algorithm>
+#include <thread>
 
 #pragma endregion
 
@@ -114,10 +115,10 @@
 #define WF(f) __V((zb::logger(f)), _LOG_WARN, __sw)
 #define EF(f) __V((zb::logger(f)), _LOG_ERROR, __se << __CODE_INFO__)
 
-#define DE __V((zb::ender(std::cerr), std::cerr << zb::util::get_cur_datetime()), _LOG_DEBUG, __sd << __CODE_INFO__)
-#define IE __V((zb::ender(std::cerr), std::cerr << zb::util::get_cur_datetime()), _LOG_INFO, __si)
-#define WE __V((zb::ender(std::cerr), std::cerr << zb::util::get_cur_datetime()), _LOG_WARN, __sw)
-#define EE __V((zb::ender(std::cerr), std::cerr << zb::util::get_cur_datetime()), _LOG_ERROR, __se << __CODE_INFO__)
+#define DE __V((zb::ender(std::cerr), std::cerr << zb::logger::get_cur_datetime() << "[TID:" << std::this_thread::get_id() << "]"), _LOG_DEBUG, __sd << __CODE_INFO__)
+#define IE __V((zb::ender(std::cerr), std::cerr << zb::logger::get_cur_datetime() << "[TID:" << std::this_thread::get_id() << "]"), _LOG_INFO, __si)
+#define WE __V((zb::ender(std::cerr), std::cerr << zb::logger::get_cur_datetime() << "[TID:" << std::this_thread::get_id() << "]"), _LOG_WARN, __sw)
+#define EE __V((zb::ender(std::cerr), std::cerr << zb::logger::get_cur_datetime() << "[TID:" << std::this_thread::get_id() << "]"), _LOG_ERROR, __se << __CODE_INFO__)
 
 #pragma endregion
 
@@ -125,24 +126,6 @@
 
 namespace zb
 {
-    class util
-    {
-    public:
-        static __t_string get_cur_datetime()
-        {
-            auto dat = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-            std::tm buf;
-#if defined(_MSC_VER)
-            localtime_s(&buf, &dat);
-#else
-            localtime_r(&dat, &buf);
-#endif
-            __t_stringstream ss;
-            ss << std::put_time(&buf, __t("[%Y-%m-%d, %H:%M:%S]"));
-            return ss.str();
-        }
-    };
-
     class logger
     {
     public:
@@ -170,6 +153,7 @@ namespace zb
             static __t_string _g_log_file = "log.txt";
             static std::shared_ptr<std::mutex> _g_log_locker = std::make_shared<std::mutex>();
 
+            std::lock_guard<std::mutex> lk(*_g_log_locker);
             if (nullptr != file && !file->empty())
             {
                 _g_log_file = *file;
@@ -177,6 +161,22 @@ namespace zb
             }
             auto lg = std::make_shared<logger>(_g_log_file, _g_log_locker);
             return lg;
+        }
+
+        static __t_string get_cur_datetime()
+        {
+            auto now = std::chrono::system_clock::now();
+            auto dat = std::chrono::system_clock::to_time_t(now);
+            std::tm buf;
+#if defined(_MSC_VER)
+            localtime_s(&buf, &dat);
+#else
+            localtime_r(&dat, &buf);
+#endif
+            auto ms = (std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()) % 1000000).count();
+            __t_stringstream ss;
+            ss << std::put_time(&buf, __t("[%Y-%m-%d, %H:%M:%S")) << "." << std::setfill('0') << std::setw(6) << ms << "]";
+            return ss.str();
         }
 
 #pragma endregion
@@ -194,7 +194,6 @@ namespace zb
                 ss.clear();
                 return *this;
             }
-
             ss << s;
             return *this;
         }
@@ -203,7 +202,6 @@ namespace zb
         {
             if (log_file.empty())
                 return;
-
             if (log_lock)
                 log_lock->lock();
 
@@ -242,9 +240,9 @@ namespace zb
                 {
                     ofs.open(log_file, std::ofstream::out | std::ofstream::app);
                 }
-                ofs << util::get_cur_datetime()
+                ofs << get_cur_datetime()
+                    << "[TID:" << std::this_thread::get_id() << "]"
                     << ss.str()
-                    << std::noboolalpha
                     << std::endl;
                 ofs.close();
             }
