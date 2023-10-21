@@ -173,9 +173,9 @@ namespace zb
 #else
             localtime_r(&dat, &buf);
 #endif
-            auto ms = (std::chrono::duration_cast<std::chrono::microseconds>(now.time_since_epoch()) % 1000000).count();
+            auto ms = (std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count()) % 1000;
             __t_stringstream ss;
-            ss << std::put_time(&buf, __t("[%Y-%m-%d, %H:%M:%S")) << "." << std::setfill('0') << std::setw(6) << ms << "]";
+            ss << std::put_time(&buf, __t("[%Y-%m-%d, %H:%M:%S")) << "." << std::setfill('0') << std::setw(3) << ms << "]";
             return ss.str();
         }
 

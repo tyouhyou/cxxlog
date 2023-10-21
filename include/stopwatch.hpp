@@ -39,35 +39,67 @@ namespace zb
             return *this;
         }
 
-        long long elaspsed()
+        inline long long elaspsed()
         {
-            return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - startpoint).count();
+            return during<std::chrono::nanoseconds>(
+                startpoint,
+                std::chrono::high_resolution_clock::now());
         }
 
-        long long wrap()
+        inline long long elaspsed_ms()
+        {
+            return during<std::chrono::milliseconds>(
+                startpoint,
+                std::chrono::high_resolution_clock::now());
+        }
+
+        inline long long wrap()
         {
             auto temppoint = std::chrono::high_resolution_clock::now();
-            auto dur = std::chrono::duration_cast<std::chrono::microseconds>(temppoint - lastpoint);
+            auto dur = during<std::chrono::nanoseconds>(lastpoint, temppoint);
             lastpoint = temppoint;
-            return dur.count();
+            return dur;
         }
 
-        void mark(std::string m)
+        inline long long wrap_ms()
+        {
+            auto temppoint = std::chrono::high_resolution_clock::now();
+            auto dur = during<std::chrono::milliseconds>(lastpoint, temppoint);
+            lastpoint = temppoint;
+            return dur;
+        }
+
+        inline void mark(const std::string &m)
         {
             mark_list[m] = std::chrono::high_resolution_clock::now();
         }
 
-        long long measure(std::string mark)
+        inline long long measure(const std::string &mark)
         {
-            auto temppoint = std::chrono::high_resolution_clock::now();
-            auto dur = std::chrono::duration_cast<std::chrono::microseconds>(temppoint - mark_list[mark]);
-            return dur.count();
+            return during<std::chrono::nanoseconds>(
+                mark_list[mark],
+                std::chrono::high_resolution_clock::now());
         }
 
-        long long measure(std::string mark1, std::string mark2)
+        inline long long measure_ms(const std::string &mark)
         {
-            auto dur = std::chrono::duration_cast<std::chrono::microseconds>(mark_list[mark2] - mark_list[mark1]);
-            return dur.count();
+            return during<std::chrono::milliseconds>(
+                mark_list[mark],
+                std::chrono::high_resolution_clock::now());
+        }
+
+        inline long long measure(const std::string &mark1, const std::string &mark2)
+        {
+            return during<std::chrono::nanoseconds>(
+                mark_list[mark1],
+                mark_list[mark2]);
+        }
+
+        inline long long measure_ms(const std::string &mark1, const std::string &mark2)
+        {
+            return during<std::chrono::milliseconds>(
+                mark_list[mark1],
+                mark_list[mark2]);
         }
 
         stopwatch &reset()
@@ -84,6 +116,14 @@ namespace zb
         std::chrono::high_resolution_clock::time_point startpoint;
         std::chrono::high_resolution_clock::time_point lastpoint;
         std::unordered_map<std::string, std::chrono::high_resolution_clock::time_point> mark_list;
+
+        template <class T>
+        inline long long during(
+            const std::chrono::time_point<std::chrono::high_resolution_clock> &d1,
+            const std::chrono::time_point<std::chrono::high_resolution_clock> &d2)
+        {
+            return std::chrono::duration_cast<T>(d2 - d1).count();
+        }
     };
 
 } // namespace zb
