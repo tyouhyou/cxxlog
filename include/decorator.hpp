@@ -35,10 +35,7 @@ namespace zb
             return *this;
         }
 
-        deco<TR, TARGS...> &operator()(TARGS... args)
-        {
-            return call(std::forward<TARGS>(args)...);
-        }
+        virtual TR operator()(TARGS... args) = 0;
 
         auto call(TARGS... args) -> deco<TR, TARGS...> &
         {
@@ -88,6 +85,15 @@ namespace zb
     template <class TR, class... TARGS>
     class deco_func : public deco<TR, TARGS...>
     {
+    public:
+        deco_func<TR, TARGS...>() = default;
+
+        TR operator()(TARGS... args) override
+        {
+            deco<TR, TARGS...>::call(std::forward<TARGS>(args)...);
+            return _result();
+        }
+
     protected:
         TR _result() override { return rst; }
         std::shared_ptr<TR> _presult() override { return std::make_shared<TR>(rst); }
@@ -103,6 +109,13 @@ namespace zb
     template <class... TARGS>
     class deco_action : public deco<void, TARGS...>
     {
+    public:
+        deco_action<TARGS...>() = default;
+        void operator()(TARGS... args) override
+        {
+            deco<void, TARGS...>::call(std::forward<TARGS>(args)...);
+        }
+
     protected:
         void _result() override {}
         std::shared_ptr<void> _presult() override { return nullptr; }

@@ -3,9 +3,9 @@ __*Refer to [wiki page](https://github.com/tyouhyou/cxx-toolset/wiki) for detail
 In this toolset, we have utilities such as Logger, Stopwatch, Decorator etc.
 
 # _TOC_
-- [Logger](#Logger)
-- [Stopwatch](#Stopwatch)
-- [Decorator](#Decorator)
+- [Logger](#logger)
+- [Stopwatch](#stopwatch)
+- [Decorator](#decorator)
 
 # Logger
 Just leave the log text, Logger will take care the rest of matter such as logging time, logging level, file name, line etc. As follows:
@@ -30,13 +30,13 @@ To record a performance
 sw.start();
 // your code
 auto dur = sw.elaspsed();
-IL << "The duration from start is " << dur << "micro seconds.";
+IL << "The duration from start is " << dur << "nano seconds.";
 // another code
 dur = sw.wrap();
-IL << "The stopwatch return to zero. and the duration from start by now is " << dur << "micro seconds.";
+IL << "The stopwatch return to zero. and the duration from start by now is " << dur << "nano seconds.";
 // code
 dur = sw.elaspsed();
-IL << "The duration from wrap by now is " << dur << "micro seconds.";
+IL << "The duration from wrap by now is " << dur << "nano seconds.";
 ```
 And more convient recording api allowing us to recording duration between any two points.
 ```

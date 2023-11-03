@@ -7,6 +7,7 @@
 #include <codecvt>
 #include <locale>
 #include <thread>
+#include <chrono>
 
 using namespace zb;
 
@@ -38,7 +39,7 @@ void test_wlogger()
     WF(L"test/log.txt") << L"警告";
     EF(L"test/log.txt") << L"エラー";
 
-    std::cerr << "elapsed: " << sw.elaspsed() << " microseconds.";
+    std::cerr << "elapsed: " << sw.elaspsed() << " nanoseconds.";
 #endif
 }
 
@@ -78,21 +79,23 @@ void test_logger()
     IL << "Let me inform you.";
     WL << "Alert, paradise is falling";
     EL << "OMG, it crashed.";
+    // std::this_thread::sleep_for(std::chrono::seconds(1));
     DL << "バグ";
     IL << "Info";
     WL << "警告";
     EL << "エラー";
 
-    IE << "The first group elasped: " << sw.wrap() << " microseconds";
+    IE << "The first group elasped: " << sw.wrap() << " ns";
     sw.mark("first group end");
-    IE << "start -> 1: " << sw.measure("start", "first group end");
+    IE << "start -> 1 (ns) : " << sw.measure("start", "first group end");
+    IE << "start -> 1 (ms) : " << sw.measure_ms("start", "first group end");
 
     DF(W2SL(L"test/debug.log")) << "This is debug message.";
     IF("test/info.log") << "Information for you.";
     WF("test/warn.log") << "I warn you.";
     EF("test/error.log") << "An error message goes here.";
 
-    IE << "The second group elasped: " << sw.wrap() << " microseconds";
+    IE << "The second group elasped: " << sw.wrap() << " nanoseconds";
     sw.mark("second group end");
     IE << "1 -> 2: " << sw.measure("first group end", "second group end");
 
@@ -101,12 +104,12 @@ void test_logger()
     WF("test/log.txt") << "警告";
     EF("test/log.txt") << "エラー";
 
-    IE << "The third group elasped: " << sw.wrap() << " microseconds";
+    IE << "The third group elasped: " << sw.wrap() << " nanoseconds";
     sw.mark("third group end");
     IE << "2 -> 3: " << sw.measure("second group end", "third group end");
 
     IE << "start -> Third group: " << sw.measure("start", "third group end");
-    IE << "Totally: " << sw.elaspsed() << " microseconds.";
+    IE << "Totally: " << sw.elaspsed() << " nanoseconds.";
 
     // auto callable = deco_beforeafter(
     //     [](int a, int b) -> int
@@ -120,26 +123,28 @@ void test_logger()
 
     bool rst_before = false;
     bool rst_after = false;
-    auto cal = deco_func<int, int>()
-                   .wrap([](int count) -> int
-                         {
+    deco_func<int, int> cal;
+    cal.wrap([](int count) -> int
+             {
         auto ret = 0;
         for(int i=0; i<count; i++)
         {
             ret += i;
         }
         return ret; })
-                   .wrap_before([&sw](int) -> bool
-                                {
-            IE << "func starts.";
-            sw.mark("count");
-            return true; })
-                   .wrap_after([&sw](int) -> bool
-                               { IE << "func ended. elapsed: " << sw.measure("count") / 1000.0 << " ms.";
-                    return true; })
-                   .call(1000)
-                   .result(rst_before, rst_after);
-    IE << "count result: " << cal;
+        .wrap_before([&sw](int) -> bool
+                     {
+        IE << "func starts.";
+        sw.mark("count");
+        std::this_thread::sleep_for(std::chrono::milliseconds(3));
+        return true; })
+        .wrap_after([&sw](int) -> bool
+                    { IE << "func ended. elapsed: " << sw.measure("count") << " ns."; IE << "again measure in ms: " << sw.measure_ms("count") << " ms";
+                return true; });
+
+    // auto val = cal.call(1000).result(rst_before, rst_after);
+    auto val = cal(100);
+    IE << "count result: " << val;
     IE << "func before result: " << rst_before;
     IE << "func after result: " << rst_after;
 
@@ -160,12 +165,14 @@ void test_logger()
         sw.mark("noreturn");
         return true; })
         .wrap_after([&sw](int) -> bool
-                    { IE << "action ended. elapsed: " << sw.measure("noreturn") / 1000.0 << " ms.";
+                    { IE << "action ended. elapsed: " << sw.measure("noreturn") << " ns.";
                       return true; })
         .call(100000)
         .result(rst_before, rst_after);
     IE << "action before result: " << rst_before;
     IE << "action after result: " << rst_after;
+
+    IE << "Totally: " << sw.measure_ms("start") << " ms.";
 
 #endif
 }
