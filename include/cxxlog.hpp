@@ -181,8 +181,8 @@ namespace zb
 
 #pragma endregion
 
-        logger(const __t_string &logfile, const std::shared_ptr<std::mutex> &locker = nullptr)
-            : log_file{logfile}, log_lock{locker}
+        logger(const __t_string &logfile, const std::shared_ptr<std::mutex> &locker = nullptr, const bool& leading_info = true)
+            : log_file{logfile}, log_lock{locker}, need_leading{leading_info}
         {
         }
 
@@ -203,7 +203,7 @@ namespace zb
             if (log_file.empty())
                 return;
             if (log_lock)
-                log_lock->lock();
+                std::lock_guard<std::mutex> lock(*log_lock);
 
 #if defined(_WLOGGER)
             auto curloc = std::locale::global(std::locale(""));
@@ -240,9 +240,11 @@ namespace zb
                 {
                     ofs.open(log_file, std::ofstream::out | std::ofstream::app);
                 }
+                
+                if (need_leading)
                 ofs << get_cur_datetime()
-                    << "[TID:" << std::this_thread::get_id() << "]"
-                    << ss.str()
+                    << "[TID:" << std::this_thread::get_id() << "]";
+                ofs << ss.str()
                     << std::endl;
                 ofs.close();
             }
@@ -253,9 +255,6 @@ namespace zb
 #if defined(_WLOGGER)
             std::locale::global(curloc);
 #endif
-
-            if (log_lock)
-                log_lock->unlock();
         }
 
     private:
@@ -268,6 +267,7 @@ namespace zb
         __t_string log_file;
         __t_stringstream ss;
         std::shared_ptr<std::mutex> log_lock;
+        bool need_leading;
     };
 
     class ender
