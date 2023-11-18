@@ -13,9 +13,11 @@
 #include <mutex>
 #include <unordered_map>
 
+#define ns2ms(ns) ns/1000000.0
+
 namespace zb
 {
-
+    template <typename T = std::chrono::nanoseconds>
     class stopwatch
     {
     public:
@@ -31,6 +33,7 @@ namespace zb
             return sw;
         }
 
+    public:
         stopwatch &start()
         {
             mark_list.clear();
@@ -41,14 +44,7 @@ namespace zb
 
         inline long long elaspsed()
         {
-            return during<std::chrono::nanoseconds>(
-                startpoint,
-                std::chrono::high_resolution_clock::now());
-        }
-
-        inline long long elaspsed_ms()
-        {
-            return during<std::chrono::milliseconds>(
+            return during(
                 startpoint,
                 std::chrono::high_resolution_clock::now());
         }
@@ -56,15 +52,7 @@ namespace zb
         inline long long wrap()
         {
             auto temppoint = std::chrono::high_resolution_clock::now();
-            auto dur = during<std::chrono::nanoseconds>(lastpoint, temppoint);
-            lastpoint = temppoint;
-            return dur;
-        }
-
-        inline long long wrap_ms()
-        {
-            auto temppoint = std::chrono::high_resolution_clock::now();
-            auto dur = during<std::chrono::milliseconds>(lastpoint, temppoint);
+            auto dur = during(lastpoint, temppoint);
             lastpoint = temppoint;
             return dur;
         }
@@ -76,28 +64,14 @@ namespace zb
 
         inline long long measure(const std::string &mark)
         {
-            return during<std::chrono::nanoseconds>(
-                mark_list[mark],
-                std::chrono::high_resolution_clock::now());
-        }
-
-        inline long long measure_ms(const std::string &mark)
-        {
-            return during<std::chrono::milliseconds>(
+            return during(
                 mark_list[mark],
                 std::chrono::high_resolution_clock::now());
         }
 
         inline long long measure(const std::string &mark1, const std::string &mark2)
         {
-            return during<std::chrono::nanoseconds>(
-                mark_list[mark1],
-                mark_list[mark2]);
-        }
-
-        inline long long measure_ms(const std::string &mark1, const std::string &mark2)
-        {
-            return during<std::chrono::milliseconds>(
+            return during(
                 mark_list[mark1],
                 mark_list[mark2]);
         }
@@ -117,7 +91,6 @@ namespace zb
         std::chrono::high_resolution_clock::time_point lastpoint;
         std::unordered_map<std::string, std::chrono::high_resolution_clock::time_point> mark_list;
 
-        template <class T>
         inline long long during(
             const std::chrono::time_point<std::chrono::high_resolution_clock> &d1,
             const std::chrono::time_point<std::chrono::high_resolution_clock> &d2)

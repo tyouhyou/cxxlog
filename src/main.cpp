@@ -88,7 +88,6 @@ void test_logger()
     IE << "The first group elasped: " << sw.wrap() << " ns";
     sw.mark("first group end");
     IE << "start -> 1 (ns) : " << sw.measure("start", "first group end");
-    IE << "start -> 1 (ms) : " << sw.measure_ms("start", "first group end");
 
     DF(W2SL(L"test/debug.log")) << "This is debug message.";
     IF("test/info.log") << "Information for you.";
@@ -139,7 +138,7 @@ void test_logger()
         std::this_thread::sleep_for(std::chrono::milliseconds(3));
         return true; })
         .wrap_after([&sw](int) -> bool
-                    { IE << "func ended. elapsed: " << sw.measure("count") << " ns."; IE << "again measure in ms: " << sw.measure_ms("count") << " ms";
+                    { IE << "func ended. elapsed: " << sw.measure("count") << " ns.";
                 return true; });
 
     // auto val = cal.call(1000).result(rst_before, rst_after);
@@ -172,7 +171,7 @@ void test_logger()
     IE << "action before result: " << rst_before;
     IE << "action after result: " << rst_after;
 
-    IE << "Totally: " << sw.measure_ms("start") << " ms.";
+    IE << "Totally: " << ns2ms(sw.measure("start")) << " ms.";
 
 #endif
 }
