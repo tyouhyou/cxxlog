@@ -4,11 +4,11 @@ CFLAGS			= /c /std:c++14 /EHsc
 DIR_SRC = .\src
 DIR_INC = .\include
 DIR_BIN = .\bin
-OBJECTS = $(DIR_BIN)\main.obj
-EXECUTABLE = $(DIR_BIN)\main.exe
+OBJECTS = $(DIR_BIN)\test.obj
+EXECUTABLE = $(DIR_BIN)\test.exe
 
-$(DIR_BIN)\main.obj: $(DIR_SRC)\main.cpp
-	cl $(CFLAGS) /Fo:$(DIR_BIN)\main.obj /I$(DIR_INC) -c $(DIR_SRC)\main.cpp
+$(DIR_BIN)\test.obj: $(DIR_SRC)\test.cpp
+	cl $(CFLAGS) /Fo:$(DIR_BIN)\test.obj /I$(DIR_INC) -c $(DIR_SRC)\test.cpp
 
 $(EXECUTABLE) : $(OBJECTS)
 	link /MACHINE:x64 /out:$(EXECUTABLE) $(OBJECTS)

@@ -1,5 +1,5 @@
 /* *
- * stopwatch for performance measuring purpose.
+ * Stopwatch for performance measuring purpose.
  *
  * @author  tyouhyou    github.com/tyouhyou
  * @license GPL
@@ -14,27 +14,22 @@
 #include <unordered_map>
 
 #define ns2ms(ns) ns/1000000.0
+#define us2ms(us) ns/1000.0
 
 namespace zb
 {
     template <typename T = std::chrono::nanoseconds>
-    class stopwatch
+    class Stopwatch
     {
     public:
-        static std::shared_ptr<stopwatch> g_sw()
+        static std::shared_ptr<Stopwatch> g_sw()
         {
-            static std::shared_ptr<stopwatch> sw;
-            static std::mutex mtx;
-            std::lock_guard<std::mutex> lock(mtx);
-            if (!sw)
-            {
-                sw = std::make_shared<stopwatch>();
-            }
+            static std::shared_ptr<Stopwatch> sw = std::make_shared<Stopwatch>();
             return sw;
         }
 
     public:
-        stopwatch &start()
+        Stopwatch &start()
         {
             mark_list.clear();
             startpoint = std::chrono::high_resolution_clock::now();
@@ -76,12 +71,12 @@ namespace zb
                 mark_list[mark2]);
         }
 
-        stopwatch &reset()
+        Stopwatch &reset()
         {
             return start();
         }
 
-        ~stopwatch()
+        ~Stopwatch()
         {
             mark_list.clear();
         }
@@ -98,5 +93,9 @@ namespace zb
             return std::chrono::duration_cast<T>(d2 - d1).count();
         }
     };
+
+    using Stopwatch_ns = Stopwatch<std::chrono::nanoseconds>;
+    using Stopwatch_us = Stopwatch<std::chrono::microseconds>;
+    using Stopwatch_ms = Stopwatch<std::chrono::milliseconds>;
 
 } // namespace zb

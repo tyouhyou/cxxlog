@@ -7,7 +7,7 @@ INCLUDE	:= include
 LIB		:= lib
 
 LIBRARIES	:=
-EXECUTABLE	:= main
+EXECUTABLE	:= test
 SOURCEDIRS	:= $(shell find $(SRC) -type d)
 OBJDIR   	:= $(shell find $(BIN) -type d)
 INCLUDEDIRS	:= $(shell find $(INCLUDE) -type d)

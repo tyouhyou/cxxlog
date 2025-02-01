@@ -3,9 +3,9 @@ __*Refer to [wiki page](https://github.com/tyouhyou/cxx-toolset/wiki) for detail
 In this toolset, we have utilities such as Logger, Stopwatch, Decorator etc.
 
 # _TOC_
-- [Logger](#logger)
-- [Stopwatch](#stopwatch)
-- [Decorator](#decorator)
+- [Logger](#Logger)
+- [Stopwatch](#Stopwatch)
+- [Decorator](#Decorator)
 
 # Logger
 Just leave the log text, Logger will take care the rest of matter such as logging time, logging level, file name, line etc. As follows:
@@ -33,7 +33,7 @@ auto dur = sw.elaspsed();
 IL << "The duration from start is " << dur << "nano seconds.";
 // another code
 dur = sw.wrap();
-IL << "The stopwatch return to zero. and the duration from start by now is " << dur << "nano seconds.";
+IL << "The Stopwatch return to zero. and the duration from start by now is " << dur << "nano seconds.";
 // code
 dur = sw.elaspsed();
 IL << "The duration from wrap by now is " << dur << "nano seconds.";
@@ -53,7 +53,7 @@ dur3 = sw.measure("second point", "third point");
 # Decorator
 We can wrap a function to leave log before and after the function run. Sure, it is not just for logging. Do what you do in your python decorator.
 ```
-auto fun = deco_func<int, int>()
+auto fun = Deco_func<int, int>()
   .wrap(some_function)
   .wrap_before([](int)->bool {IL << "before run function."; return true})
   .wrap_after([](int)->bool {IL << "before run function."; return true})

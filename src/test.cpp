@@ -23,7 +23,7 @@ int main()
 void test_wlogger()
 {
 #ifdef _WLOGGER
-    stopwatch sw;
+    Stopwatch<> sw;
     sw.start();
 
     SET_LOG_FILE(S2WL("test/ログ.txt"));
@@ -64,7 +64,7 @@ void test_logger()
 {
 #ifndef _WLOGGER
 
-    stopwatch sw;
+    Stopwatch_ns sw;
 
     SET_LOG_FILE(W2SL(L"test/ログ.txt"));
     SET_LOG_MAX_SIZE(20);
@@ -82,8 +82,10 @@ void test_logger()
     // std::this_thread::sleep_for(std::chrono::seconds(1));
     DL << "バグ";
     IL << "Info";
+#ifndef _WIN32
     WL << "警告";
     EL << "エラー";
+#endif
 
     IE << "The first group elasped: " << sw.wrap() << " ns";
     sw.mark("first group end");
@@ -100,8 +102,10 @@ void test_logger()
 
     DF("test/log.txt") << "バグ";
     IF("test/log.txt") << "Info";
+#ifndef _WIN32
     WF("test/log.txt") << "警告";
     EF("test/log.txt") << "エラー";
+#endif
 
     IE << "The third group elasped: " << sw.wrap() << " nanoseconds";
     sw.mark("third group end");
@@ -122,7 +126,7 @@ void test_logger()
 
     bool rst_before = false;
     bool rst_after = false;
-    deco_func<int, int> cal;
+    Deco_func<int, int> cal;
     cal.wrap([](int count) -> int
              {
         auto ret = 0;
@@ -149,7 +153,7 @@ void test_logger()
 
     rst_before = false;
     rst_after = false;
-    deco_action<int>()
+    Deco_action<int>()
         .wrap([](int count) -> void
               {
         auto ret = 0;

@@ -14,22 +14,22 @@
 namespace zb
 {
     template <class TR, class... TARGS>
-    class deco
+    class Deco
     {
     public:
-        auto wrap(std::function<TR(TARGS...)> fn) -> deco<TR, TARGS...> &
+        auto wrap(std::function<TR(TARGS...)> fn) -> Deco<TR, TARGS...> &
         {
             fun = std::forward<std::function<TR(TARGS...)>>(fn);
             return *this;
         }
 
-        auto wrap_before(std::function<bool(TARGS...)> fn) -> deco<TR, TARGS...> &
+        auto wrap_before(std::function<bool(TARGS...)> fn) -> Deco<TR, TARGS...> &
         {
             fn_b = std::forward<std::function<bool(TARGS...)>>(fn);
             return *this;
         }
 
-        auto wrap_after(std::function<bool(TARGS...)> fn) -> deco<TR, TARGS...> &
+        auto wrap_after(std::function<bool(TARGS...)> fn) -> Deco<TR, TARGS...> &
         {
             fn_a = std::forward<std::function<bool(TARGS...)>>(fn);
             return *this;
@@ -37,20 +37,20 @@ namespace zb
 
         virtual TR operator()(TARGS... args) = 0;
 
-        auto call(TARGS... args) -> deco<TR, TARGS...> &
+        auto call(TARGS... args) -> Deco<TR, TARGS...> &
         {
-            if (deco<TR, TARGS...>::fn_b)
+            if (Deco<TR, TARGS...>::fn_b)
             {
-                fn_b_rst = deco<TR, TARGS...>::fn_b(std::forward<TARGS>(args)...);
+                fn_b_rst = Deco<TR, TARGS...>::fn_b(std::forward<TARGS>(args)...);
                 if (!fn_b_rst)
                 {
                     return *this;
                 }
             }
             _call(std::forward<TARGS>(args)...);
-            if (deco<TR, TARGS...>::fn_a)
+            if (Deco<TR, TARGS...>::fn_a)
             {
-                fn_a_rst = deco<TR, TARGS...>::fn_a(std::forward<TARGS>(args)...);
+                fn_a_rst = Deco<TR, TARGS...>::fn_a(std::forward<TARGS>(args)...);
             }
             return *this;
         }
@@ -83,14 +83,14 @@ namespace zb
     };
 
     template <class TR, class... TARGS>
-    class deco_func : public deco<TR, TARGS...>
+    class Deco_func : public Deco<TR, TARGS...>
     {
     public:
-        deco_func<TR, TARGS...>() = default;
+        Deco_func<TR, TARGS...>() = default;
 
         TR operator()(TARGS... args) override
         {
-            deco<TR, TARGS...>::call(std::forward<TARGS>(args)...);
+            Deco<TR, TARGS...>::call(std::forward<TARGS>(args)...);
             return _result();
         }
 
@@ -99,7 +99,7 @@ namespace zb
         std::shared_ptr<TR> _presult() override { return std::make_shared<TR>(rst); }
         void _call(TARGS... args) override
         {
-            rst = deco<TR, TARGS...>::fun(std::forward<TARGS>(args)...);
+            rst = Deco<TR, TARGS...>::fun(std::forward<TARGS>(args)...);
         }
 
     private:
@@ -107,13 +107,13 @@ namespace zb
     };
 
     template <class... TARGS>
-    class deco_action : public deco<void, TARGS...>
+    class Deco_action : public Deco<void, TARGS...>
     {
     public:
-        deco_action<TARGS...>() = default;
+        Deco_action<TARGS...>() = default;
         void operator()(TARGS... args) override
         {
-            deco<void, TARGS...>::call(std::forward<TARGS>(args)...);
+            Deco<void, TARGS...>::call(std::forward<TARGS>(args)...);
         }
 
     protected:
@@ -121,7 +121,7 @@ namespace zb
         std::shared_ptr<void> _presult() override { return nullptr; }
         void _call(TARGS... args) override
         {
-            deco<void, TARGS...>::fun(std::forward<TARGS>(args)...);
+            Deco<void, TARGS...>::fun(std::forward<TARGS>(args)...);
         }
     };
 

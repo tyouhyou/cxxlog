@@ -102,23 +102,23 @@
 
 #pragma region : Logging macros.USE MACROS DEFINED IN THIS REGION ONLY.
 
-#define SET_LOG_FILE(f) zb::logger::set_g_log_file(f)
-#define SET_LOG_MAX_SIZE(lz) zb::logger::get_log_max_size(lz)
+#define SET_LOG_FILE(f) zb::Logger::set_g_log_file(f)
+#define SET_LOG_MAX_SIZE(lz) zb::Logger::get_log_max_size(lz)
 
-#define DL __V((*zb::logger::get_g_logger()), _LOG_DEBUG, __sd << __CODE_INFO__)
-#define IL __V((*zb::logger::get_g_logger()), _LOG_INFO, __si)
-#define WL __V((*zb::logger::get_g_logger()), _LOG_WARN, __sw)
-#define EL __V((*zb::logger::get_g_logger()), _LOG_ERROR, __se << __CODE_INFO__)
+#define DL __V((*zb::Logger::get_g_logger()), _LOG_DEBUG, __sd << __CODE_INFO__)
+#define IL __V((*zb::Logger::get_g_logger()), _LOG_INFO, __si)
+#define WL __V((*zb::Logger::get_g_logger()), _LOG_WARN, __sw)
+#define EL __V((*zb::Logger::get_g_logger()), _LOG_ERROR, __se << __CODE_INFO__)
 
-#define DF(f) __V((zb::logger(f)), _LOG_DEBUG, __sd << __CODE_INFO__)
-#define IF(f) __V((zb::logger(f)), _LOG_INFO, __si)
-#define WF(f) __V((zb::logger(f)), _LOG_WARN, __sw)
-#define EF(f) __V((zb::logger(f)), _LOG_ERROR, __se << __CODE_INFO__)
+#define DF(f) __V((zb::Logger(f)), _LOG_DEBUG, __sd << __CODE_INFO__)
+#define IF(f) __V((zb::Logger(f)), _LOG_INFO, __si)
+#define WF(f) __V((zb::Logger(f)), _LOG_WARN, __sw)
+#define EF(f) __V((zb::Logger(f)), _LOG_ERROR, __se << __CODE_INFO__)
 
-#define DE __V((zb::ender(std::cerr), std::cerr << zb::logger::get_cur_datetime() << "[TID:" << std::this_thread::get_id() << "]"), _LOG_DEBUG, __sd << __CODE_INFO__)
-#define IE __V((zb::ender(std::cerr), std::cerr << zb::logger::get_cur_datetime() << "[TID:" << std::this_thread::get_id() << "]"), _LOG_INFO, __si)
-#define WE __V((zb::ender(std::cerr), std::cerr << zb::logger::get_cur_datetime() << "[TID:" << std::this_thread::get_id() << "]"), _LOG_WARN, __sw)
-#define EE __V((zb::ender(std::cerr), std::cerr << zb::logger::get_cur_datetime() << "[TID:" << std::this_thread::get_id() << "]"), _LOG_ERROR, __se << __CODE_INFO__)
+#define DE __V((zb::ender(std::cerr), std::cerr << zb::Logger::get_cur_datetime() << "[TID:" << std::this_thread::get_id() << "]"), _LOG_DEBUG, __sd << __CODE_INFO__)
+#define IE __V((zb::ender(std::cerr), std::cerr << zb::Logger::get_cur_datetime() << "[TID:" << std::this_thread::get_id() << "]"), _LOG_INFO, __si)
+#define WE __V((zb::ender(std::cerr), std::cerr << zb::Logger::get_cur_datetime() << "[TID:" << std::this_thread::get_id() << "]"), _LOG_WARN, __sw)
+#define EE __V((zb::ender(std::cerr), std::cerr << zb::Logger::get_cur_datetime() << "[TID:" << std::this_thread::get_id() << "]"), _LOG_ERROR, __se << __CODE_INFO__)
 
 #pragma endregion
 
@@ -126,7 +126,7 @@
 
 namespace zb
 {
-    class logger
+    class Logger
     {
     public:
 #pragma region : static methods
@@ -148,7 +148,7 @@ namespace zb
             return _g_log_file_size;
         }
 
-        static std::shared_ptr<logger> get_g_logger(const __t_string *file = nullptr)
+        static std::shared_ptr<Logger> get_g_logger(const __t_string *file = nullptr)
         {
             static __t_string _g_log_file = "log.txt";
             static std::shared_ptr<std::mutex> _g_log_locker = std::make_shared<std::mutex>();
@@ -157,9 +157,9 @@ namespace zb
             if (nullptr != file && !file->empty())
             {
                 _g_log_file = *file;
-                return (std::shared_ptr<logger>)nullptr;
+                return (std::shared_ptr<Logger>)nullptr;
             }
-            auto lg = std::make_shared<logger>(_g_log_file, _g_log_locker);
+            auto lg = std::make_shared<Logger>(_g_log_file, _g_log_locker);
             return lg;
         }
 
@@ -181,13 +181,13 @@ namespace zb
 
 #pragma endregion
 
-        logger(const __t_string &logfile, const std::shared_ptr<std::mutex> &locker = nullptr, const bool& leading_info = true)
+        Logger(const __t_string &logfile, const std::shared_ptr<std::mutex> &locker = nullptr, const bool& leading_info = true)
             : log_file{logfile}, log_lock{locker}, need_leading{leading_info}
         {
         }
 
         template <typename T>
-        logger &operator<<(const T &s)
+        Logger &operator<<(const T &s)
         {
             if (ss.bad() || ss.fail())
             {
@@ -198,7 +198,7 @@ namespace zb
             return *this;
         }
 
-        ~logger()
+        ~Logger()
         {
             if (log_file.empty())
                 return;
@@ -258,11 +258,11 @@ namespace zb
         }
 
     private:
-        logger() = delete;
-        logger(const logger &) = delete;
-        logger(const logger &&) = delete;
-        logger &operator=(const logger &) = delete;
-        logger &operator=(const logger &&) = delete;
+        Logger() = delete;
+        Logger(const Logger &) = delete;
+        Logger(const Logger &&) = delete;
+        Logger &operator=(const Logger &) = delete;
+        Logger &operator=(const Logger &&) = delete;
 
         __t_string log_file;
         __t_stringstream ss;

@@ -11,14 +11,14 @@
 #include <codecvt>
 #include <string>
 
-#define S2WL strcvt::str_to_wstr_w_locale
-#define W2SL strcvt::wstr_to_str_w_locale
+#define S2WL StrCvt::str_to_wstr_w_locale
+#define W2SL StrCvt::wstr_to_str_w_locale
 #define W2U8(wstr) std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(wstr)
 #define U82W(u8s) std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(u8s)
 
 namespace zb
 {
-    class strcvt
+    class StrCvt
     {
     public:
         /*
